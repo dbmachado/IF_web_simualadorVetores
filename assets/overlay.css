@@ -1,10 +1,8 @@
-/* assets/overlay.css */
-
 /* Overlay principal cobrindo todo o conteúdo do Unity */
 #content-container {
   position: fixed;
   inset: 0;
-  z-index: 100000 !important;    /* <— z-index alto para sobrepor tudo */
+  z-index: 100000 !important;
   background-color: #0d1117;
   color: #c9d1d9;
   overflow-y: auto;
@@ -16,18 +14,21 @@
   font-family: 'Segoe UI', Tahoma, sans-serif;
 }
 
-
-/* Estilo do wrapper interno */
-.content-inner {
+/* Container Unity responsivo */
+#unity-container {
   width: 100%;
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
+  max-width: 960px;
   margin: 0 auto;
 }
 
-/* Botão fechar */
+/* Canvas responsivo: largura 100%, altura automática para manter proporção */
+#unity-canvas {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+}
+
+/* Estilo do botão fechar */
 #content-close-btn {
   position: absolute;
   top: 16px;
@@ -49,29 +50,21 @@
   background: #2ea043;
 }
 
-/* Intro */
-.intro-section {
-  text-align: center;
-  margin-top: 20px;
+/* Estrutura e estilo das seções */
+.content-inner {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin: 0 auto;
 }
-.intro-section h1 {
-  font-size: 2.5rem;
-  color: #58a6ff;
-  margin-bottom: 12px;
-}
-.intro-section p {
-  font-size: 1.2rem;
-  line-height: 1.6;
-}
-
-/* Estrutura das seções */
 .content-wrapper {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 40px;
 }
-
 .content-section {
   background-color: #161b22;
   border-radius: 8px;
@@ -85,30 +78,17 @@
 .content-section:hover {
   transform: scale(1.02);
 }
-
-/* Corpo das seções */
 .section-body {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-@media (min-width: 768px) {
-  .content-wrapper {
-    gap: 60px;
-  }
-  .section-body {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 40px;
-  }
-}
-
-/* Vídeo responsivo */
+/* Vídeo responsivo: mantém proporção 16:9 */
 .video-wrapper {
   position: relative;
   width: 100%;
-  padding-bottom: 56.25%; /* 16:9 */
+  padding-bottom: 56.25%;
   height: 0;
 }
 .video-wrapper iframe {
@@ -121,10 +101,16 @@
   border-radius: 4px;
 }
 
-/* Texto das seções */
-.section-text {
-  flex: 1;
-  font-size: 1rem;
-  line-height: 1.6;
-  margin: 0;
+/* Media query para dispositivos menores */
+@media (max-width: 480px) {
+  .content-inner {
+    padding: 10px;
+    gap: 20px;
+  }
+  #content-close-btn {
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+  }
 }
