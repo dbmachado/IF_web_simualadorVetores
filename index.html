@@ -12,9 +12,8 @@
     <script>
       function ShowSimulationOverlay() {
         const overlay = document.getElementById('content-container');
-        const unity   = document.getElementById('unity-container');
         const inner   = document.getElementById('content-inner');
-        if (!overlay || !inner || !unity) return;
+        if (!overlay || !inner) return;
 
         // Recarrega e injeta conteúdo
         fetch('assets/content.html', { cache: 'no-cache' })
@@ -22,7 +21,6 @@
           .then(html => {
             inner.innerHTML       = html;
             overlay.style.display = 'block';
-            unity.style.display   = 'none';
           })
           .catch(err => console.error('Erro ShowSimulationOverlay:', err));
       }
@@ -31,13 +29,13 @@
 
   <body>
     <!-- Overlay sempre acima -->
-    <div id="content-container" class="overlay">
+    <div id="content-container" class="overlay" style="z-index:100000;">
       <button id="content-close-btn" class="overlay-close">×</button>
       <div id="content-inner"></div>
     </div>
 
-    <!-- Container Unity escondido até o overlay fechar -->
-    <div id="unity-container" class="unity-desktop" style="position:relative; z-index:1; display:none;">
+    <!-- Container Unity sempre visível por baixo do overlay -->
+    <div id="unity-container" class="unity-desktop" style="position:relative; z-index:1; display:block;">
       <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
@@ -53,7 +51,7 @@
       </div>
     </div>
 
-    <!-- Inicializa Unity em background mas não exibe canvas -->
+    <!-- Inicializa Unity em background -->
     <script>
       const canvas = document.querySelector('#unity-canvas');
       window.unityInstance = null;
@@ -71,9 +69,9 @@
       const buildUrl  = 'Build';
       const loaderUrl = `${buildUrl}/IF_web_simualadorVetores.loader.js`;
       const config    = {
-        dataUrl: `${buildUrl}/IF_web_simualizadorVetores.data`,
-        frameworkUrl: `${buildUrl}/IF_web_simualizadorVetores.framework.js`,
-        codeUrl: `${buildUrl}/IF_web_simualizadorVetores.wasm`,
+        dataUrl: `${buildUrl}/IF_web_simualadorVetores.data`,
+        frameworkUrl: `${buildUrl}/IF_web_simualadorVetores.framework.js`,
+        codeUrl: `${buildUrl}/IF_web_simualadorVetores.wasm`,
         streamingAssetsUrl: 'StreamingAssets',
         companyName: 'DefaultCompany',
         productName: 'IFVetores',
@@ -104,16 +102,14 @@
         const overlay  = document.getElementById('content-container');
         const inner    = document.getElementById('content-inner');
         const closeBtn = document.getElementById('content-close-btn');
-        const unity    = document.getElementById('unity-container');
 
         // Exibe overlay ao carregar
         ShowSimulationOverlay();
 
-        // Ao fechar: limpa vídeos, oculta overlay, mostra canvas e fullscreen imediato
+        // Ao fechar: limpa vídeos, oculta overlay e fullscreen direto para Unity
         closeBtn.addEventListener('click', () => {
           inner.innerHTML       = '';
           overlay.style.display = 'none';
-          unity.style.display   = 'block';
           if (window.unityInstance) {
             window.unityInstance.SetFullscreen(1);
           }
