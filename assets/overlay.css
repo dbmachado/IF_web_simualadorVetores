@@ -208,3 +208,12 @@ img, iframe, video, object {
   }
 }
 
+/* Adiciona um respiro inferior */
+#content-container {
+  padding-top: 50px;      /* Espaço no topo */
+  padding-bottom: 50px;   /* Espaço no final (já discutido antes) */
+  box-sizing: border-box; /* Garante que o padding não quebre o layout */
+}
+
+
+

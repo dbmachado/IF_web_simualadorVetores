@@ -38,13 +38,19 @@
             .catch(err => console.error('Erro ShowSimulationOverlay:', err));
         }
 
-        // Botão para fechar overlay e ativar fullscreen do Unity Canvas
+        // Botão para fechar overlay e ativar fullscreen do Unity Canvas com repaint
         closeBtn.addEventListener('click', () => {
           inner.innerHTML = '';
 
           const unityCanvas = document.getElementById('unity-canvas');
           if (unityCanvas.requestFullscreen) {
-            unityCanvas.requestFullscreen().catch(err =>
+            unityCanvas.requestFullscreen().then(() => {
+              // Força repaint no canvas após fullscreen
+              setTimeout(() => {
+                unityCanvas.style.transform = 'scale(1.001)';
+                setTimeout(() => unityCanvas.style.transform = 'scale(1)', 50);
+              }, 100);
+            }).catch(err =>
               console.warn('Erro ao entrar em fullscreen:', err)
             );
           }
