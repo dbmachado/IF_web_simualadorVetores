@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unity Web Player | IFVetores</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
@@ -11,18 +11,10 @@
     <!-- Função global para reabrir o overlay -->
     <script>
       function ShowSimulationOverlay() {
-        var overlay = document.getElementById('content-container');
-        var unity   = document.getElementById('unity-container');
-        var inner   = document.getElementById('content-inner');
+        const overlay = document.getElementById('content-container');
+        const unity   = document.getElementById('unity-container');
+        const inner   = document.getElementById('content-inner');
         if (!overlay || !inner || !unity) return;
-
-        // Se estiver em fullscreen, sai para habilitar botão fechar
-        if (document.fullscreenElement) {
-          document.exitFullscreen();
-        }
-        if (window.unityInstance) {
-          window.unityInstance.SetFullscreen(0);
-        }
 
         // Recarrega e injeta conteúdo
         fetch('assets/content.html', { cache: 'no-cache' })
@@ -61,32 +53,27 @@
       </div>
     </div>
 
-    <!-- Inicializa Unity sem exibir canvas -->
+    <!-- Inicializa Unity em background mas não exibe canvas -->
     <script>
-      var canvas = document.querySelector('#unity-canvas');
+      const canvas = document.querySelector('#unity-canvas');
       window.unityInstance = null;
 
       function unityShowBanner(msg, type) {
-        var warningBanner = document.querySelector('#unity-warning');
-        function update() { warningBanner.style.display = warningBanner.children.length ? 'block' : 'none'; }
-        var div = document.createElement('div'); div.innerHTML = msg;
+        const warningBanner = document.querySelector('#unity-warning');
+        const div = document.createElement('div');
+        div.innerHTML = msg;
+        div.style = (type === 'error') ? 'background:red;padding:10px;' : 'background:yellow;padding:10px;';
         warningBanner.appendChild(div);
-        if (type === 'warning') {
-          div.style = 'background: yellow; padding: 10px;';
-          setTimeout(() => { warningBanner.removeChild(div); update(); }, 5000);
-        } else if (type === 'error') {
-          div.style = 'background: red; padding: 10px;';
-        }
-        update();
+        setTimeout(() => warningBanner.removeChild(div), 5000);
+        warningBanner.style.display = 'block';
       }
 
-      var buildUrl  = 'Build';
-      var loaderUrl = buildUrl + '/IF_web_simualadorVetores.loader.js';
-      var config    = {
-        arguments: [],
-        dataUrl: buildUrl + '/IF_web_simualadorVetores.data',
-        frameworkUrl: buildUrl + '/IF_web_simualadorVetores.framework.js',
-        codeUrl: buildUrl + '/IF_web_simualadorVetores.wasm',
+      const buildUrl  = 'Build';
+      const loaderUrl = `${buildUrl}/IF_web_simualadorVetores.loader.js`;
+      const config    = {
+        dataUrl: `${buildUrl}/IF_web_simualizadorVetores.data`,
+        frameworkUrl: `${buildUrl}/IF_web_simualizadorVetores.framework.js`,
+        codeUrl: `${buildUrl}/IF_web_simualizadorVetores.wasm`,
         streamingAssetsUrl: 'StreamingAssets',
         companyName: 'DefaultCompany',
         productName: 'IFVetores',
@@ -94,18 +81,16 @@
         showBanner: unityShowBanner
       };
 
-      var unityScript = document.createElement('script');
+      const unityScript = document.createElement('script');
       unityScript.src = loaderUrl;
-      unityScript.onload = function() {
-        createUnityInstance(canvas, config, function(progress) {
-          document.getElementById('unity-progress-bar-full').style.width = (100 * progress) + '%';
-        }).then(function(instance) {
+      unityScript.onload = () => {
+        createUnityInstance(canvas, config, progress => {
+          document.getElementById('unity-progress-bar-full').style.width = `${100 * progress}%`;
+        }).then(instance => {
           window.unityInstance = instance;
           document.getElementById('unity-loading-bar').style.display = 'none';
-          document.getElementById('unity-fullscreen-button').onclick = function() {
-            if (window.unityInstance) window.unityInstance.SetFullscreen(1);
-          };
-        }).catch(function(err) {
+          document.getElementById('unity-fullscreen-button').onclick = () => instance.SetFullscreen(1);
+        }).catch(err => {
           console.error(err);
           alert('Erro ao iniciar Unity: ' + err);
         });
@@ -116,25 +101,22 @@
     <!-- Lógica de controle do overlay -->
     <script>
       (function() {
-        var overlay  = document.getElementById('content-container');
-        var inner    = document.getElementById('content-inner');
-        var closeBtn = document.getElementById('content-close-btn');
-        var unity    = document.getElementById('unity-container');
+        const overlay  = document.getElementById('content-container');
+        const inner    = document.getElementById('content-inner');
+        const closeBtn = document.getElementById('content-close-btn');
+        const unity    = document.getElementById('unity-container');
 
-        // Exibe overlay ao carregar sem mostrar o canvas
+        // Exibe overlay ao carregar
         ShowSimulationOverlay();
 
-        // Ao fechar: limpa vídeos, dispara fullscreen e exibe canvas somente após delay curto para garantir full
-        closeBtn.addEventListener('click', function() {
+        // Ao fechar: limpa vídeos, oculta overlay, mostra canvas e fullscreen imediato
+        closeBtn.addEventListener('click', () => {
           inner.innerHTML       = '';
+          overlay.style.display = 'none';
+          unity.style.display   = 'block';
           if (window.unityInstance) {
             window.unityInstance.SetFullscreen(1);
           }
-          overlay.style.display = 'none';
-          // Delay para o fullscreen estabilizar
-          setTimeout(function() {
-            unity.style.display = 'block';
-          }, 200);
         });
       })();
     </script>
