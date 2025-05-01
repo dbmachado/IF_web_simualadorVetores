@@ -3,13 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <!-- Meta viewport para responsividade -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Meta viewport para responsividade e notch -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Unity Web Player | IFVetores</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="stylesheet" href="assets/overlay.css">
-
     <!-- scripts de overlay e Unity seguem sem alterações na lógica -->
     <script>
       function ShowSimulationOverlay() {
@@ -17,10 +16,12 @@
         const inner   = document.getElementById('content-inner');
         if (!overlay || !inner) return;
 
+        // Sai de fullscreen do Unity para não bloquear o overlay
         if (document.fullscreenElement) {
           document.exitFullscreen().catch(() => {});
         }
 
+        // Recarrega e injeta conteúdo
         fetch('assets/content.html', { cache: 'no-cache' })
           .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
           .then(html => {
