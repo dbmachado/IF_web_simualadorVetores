@@ -10,27 +10,51 @@
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="stylesheet" href="assets/overlay.css">
     <!-- scripts de overlay e Unity seguem sem alterações na lógica -->
-    <script>
-      function ShowSimulationOverlay() {
-        const overlay = document.getElementById('content-container');
-        const inner   = document.getElementById('content-inner');
-        if (!overlay || !inner) return;
+<script>
+  function ShowSimulationOverlay() {
+    const overlay = document.getElementById('content-container');
+    const inner   = document.getElementById('content-inner');
+    if (!overlay || !inner) return;
 
-        // Sai de fullscreen do Unity para não bloquear o overlay
-        if (document.fullscreenElement) {
-          document.exitFullscreen().catch(() => {});
+    // Sai de fullscreen do Unity, se houver
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+
+    // Recarrega e injeta conteúdo
+    fetch('assets/content.html', { cache: 'no-cache' })
+      .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
+      .then(html => {
+        inner.innerHTML       = html;
+        overlay.style.display = 'flex';
+
+        // Pede fullscreen no overlay
+        if (overlay.requestFullscreen) {
+          overlay.requestFullscreen().catch(err =>
+            console.warn('Não foi possível entrar em fullscreen:', err)
+          );
         }
+      })
+      .catch(err => console.error('Erro ShowSimulationOverlay:', err));
+  }
 
-        // Recarrega e injeta conteúdo
-        fetch('assets/content.html', { cache: 'no-cache' })
-          .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
-          .then(html => {
-            inner.innerHTML       = html;
-            overlay.style.display = 'flex';
-          })
-          .catch(err => console.error('Erro ShowSimulationOverlay:', err));
+  document.addEventListener('DOMContentLoaded', () => {
+    const closeBtn = document.getElementById('content-close-btn');
+    closeBtn.addEventListener('click', () => {
+      const container = document.getElementById('content-container');
+
+      // Sai do fullscreen, se ativo
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
       }
-    </script>
+
+      // Limpa e oculta
+      document.getElementById('content-inner').innerHTML = '';
+      setTimeout(() => container.style.display = 'none', 300);
+    });
+  });
+</script>
+
   </head>
   <body>
     <div id="content-container" class="overlay">
