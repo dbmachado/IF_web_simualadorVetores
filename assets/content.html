@@ -1,108 +1,76 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="assets/overlay.css">
-  <title>Simulador de Vetores</title>
-</head>
-<body>
-  <div id="content-container">
-    <button id="content-close-btn" aria-label="Fechar">×</button>
+<!-- assets/content.html -->
+<link rel="stylesheet" href="assets/overlay.css">
+<div class="content-inner">
+  <!-- Seção introdutória -->
+  <section class="intro-section">
+    <h1>Bem‑vindo ao Simulador de Vetores</h1>
+    <p>
+      Visualize e interaja com vetores (arrays) de forma dinâmica. Use este ambiente para entender a
+      estrutura, funcionamento e operações passo a passo em um ambiente gráfico intuitivo.
+    </p>
+  </section>
 
-    <div class="content-inner">
-      <!-- Logo IFRS -->
-      <div class="ifrs-logo-container">
-        <img src="assets/logo-ifrs.png" alt="Logo IFRS" class="ifrs-logo">
+  <!-- Conteúdo principal: 4 vídeos explicativos -->
+  <div class="content-wrapper">
+    <!-- Seção 1 -->
+    <section class="content-section">
+      <h2>Como funciona o simulador?</h2>
+      <div class="section-body">
+        <div class="video-wrapper">
+          <iframe
+            src="https://www.youtube.com/embed/2M8IZkT7Bck?enablejsapi=1"
+            title="Como funciona o simulador"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
       </div>
+    </section>
 
-      <!-- Seção introdutória -->
-      <section class="intro-section">
-        <h1>Bem-vindo ao Simulador de Vetores</h1>
-        <p>
-          Visualize e interaja com vetores (arrays) de forma dinâmica. Use este ambiente para entender a
-          estrutura, funcionamento e operações passo a passo em um ambiente gráfico intuitivo.
-        </p>
-      </section>
-
-      <!-- Conteúdo principal: 4 vídeos explicativos -->
-      <div class="content-wrapper">
-        <!-- Seção 1 -->
-        <section class="content-section">
-          <h2 class="video-title">Como funciona o simulador?</h2>
-          <div class="section-body">
-            <div class="video-wrapper">
-              <iframe
-                src="https://www.youtube.com/embed/2M8IZkT7Bck?enablejsapi=1"
-                title="Como funciona o simulador"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-              </iframe>
-            </div>
-          </div>
-        </section>
-
-        <!-- Seção 2 -->
-        <section class="content-section">
-          <h2 class="video-title">O que é um vetor (array)?</h2>
-          <div class="section-body">
-            <div class="video-wrapper">
-              <iframe
-                src="https://www.youtube.com/embed/2M8IZkT7Bck?enablejsapi=1"
-                title="O que é um vetor"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-              </iframe>
-            </div>
-          </div>
-        </section>
-
-        <!-- Seção 3 -->
-        <section class="content-section">
-          <h2 class="video-title">Como o vetor é estruturado?</h2>
-          <div class="section-body">
-            <div class="video-wrapper">
-              <iframe
-                src="https://www.youtube.com/embed/2M8IZkT7Bck?enablejsapi=1"
-                title="Como o vetor é estruturado"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-              </iframe>
-            </div>
-          </div>
-        </section>
-
-        <!-- Seção 4 -->
-        <section class="content-section">
-          <h2 class="video-title">Como o vetor funciona?</h2>
-          <div class="section-body">
-            <div class="video-wrapper">
-              <iframe
-                src="https://www.youtube.com/embed/2M8IZkT7Bck?enablejsapi=1"
-                title="Como o vetor funciona"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-              </iframe>
-            </div>
-          </div>
-        </section>
+    <!-- Seção 2 -->
+    <section class="content-section">
+      <h2>O que é um vetor (array)?</h2>
+      <div class="section-body">
+        <div class="video-wrapper">
+          <iframe
+            src="https://www.youtube.com/embed/2M8IZkT7Bck?enablejsapi=1"
+            title="O que é um vetor"
+            frameborder="0"
+            allowfullscreen>
+          </iframe>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- Seção 3 -->
+    <section class="content-section">
+      <h2>Como o vetor é estruturado?</h2>
+      <div class="section-body">
+        <div class="video-wrapper">
+          <iframe
+            src="https://www.youtube.com/embed/2M8IZkT7Bck?enablejsapi=1"
+            title="Como o vetor é estruturado"
+            frameborder="0"
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção 4 -->
+    <section class="content-section">
+      <h2>Como o vetor funciona?</h2>
+      <div class="section-body">
+        <div class="video-wrapper">
+          <iframe
+            src="https://www.youtube.com/embed/2M8IZkT7Bck?enablejsapi=1"
+            title="Como o vetor funciona"
+            frameborder="0"
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+    </section>
   </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const overlay  = document.getElementById('content-container');
-      const closeBtn = document.getElementById('content-close-btn');
-
-      closeBtn.addEventListener('click', () => {
-        overlay.style.display = 'none';
-      });
-    });
-  </script>
-</body>
-</html>
+</div>
