@@ -1,3 +1,16 @@
+/* assets/overlay.css */
+/* Importa a tipografia oficial */
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap');
+
+/* Variáveis da paleta IFRS (Manual de Marca) */
+:root {
+  --ifrs-green: #2f9e41;   /* HEX #2f9e41 */
+  --ifrs-red:   #cd191e;   /* HEX #cd191e */
+  --ifrs-black: #000000;   /* HEX #000000 */
+  --ifrs-white: #ffffff;
+  --ifrs-font:  'Open Sans', sans-serif;
+}
+
 /* Reset básico e configurações padrão */
 html, body {
   margin: 0;
@@ -5,50 +18,38 @@ html, body {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--ifrs-font);
+  background-color: var(--ifrs-white);
+  color: var(--ifrs-black);
 }
 
-/* Overlay principal (fullscreen responsivo com safe areas) */
+/* Overlay principal – fullscreen com safe‐areas e cor IFRS */
 #content-container {
   position: fixed;
   inset: 0;
   z-index: 100000;
-  background-color: #0d1117;
-  color: #c9d1d9;
+  background-color: var(--ifrs-green);
+  color: var(--ifrs-white);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 20px env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  padding: 50px env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* Container Unity centralizado e responsivo */
-#unity-container {
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-}
-
-/* Canvas do Unity responsivo mantendo proporção */
-#unity-canvas {
-  width: 100% !important;
-  height: auto !important;
-  display: block;
-}
-
-/* Botão fechar (responsivo e acessível) */
+/* Botão fechar – vermelho IFRS */
 #content-close-btn {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: #238636;
-  color: #fff;
+  background: var(--ifrs-red);
+  color: var(--ifrs-white);
   border: none;
   font-size: 20px;
-  width: 32px;
-  height: 32px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -57,61 +58,69 @@ html, body {
   transition: background 0.2s;
 }
 #content-close-btn:hover {
-  background: #2ea043;
+  background: #b0171a; /* 10% mais escuro */
 }
 
-/* Container interno responsivo (conteúdo principal) */
+/* Container Unity centralizado e responsivo */
+#unity-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+#unity-canvas {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+}
+
+/* Container interno – fundo branco para destacar o conteúdo */
 .content-inner {
   width: 100%;
   max-width: 1200px;
+  background-color: var(--ifrs-white);
+  padding: 20px;
+  border-radius: 8px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 40px;
   margin: 0 auto;
-  box-sizing: border-box;
-  padding: 0 20px;
 }
 
-/* Wrapper geral para conteúdos individuais */
+/* Wrapper e seções gerais */
 .content-wrapper {
-  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 40px;
+  width: 100%;
 }
-
-/* Seções individuais com efeito visual responsivo */
 .content-section {
-  background-color: #161b22;
+  background-color: var(--ifrs-white);
+  border: 2px solid var(--ifrs-green);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  transition: transform 0.2s;
-  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, border-color 0.2s;
 }
 .content-section:hover {
   transform: scale(1.02);
+  border-color: var(--ifrs-red);
 }
 
-/* Corpo das seções individuais (flexível e responsivo) */
+/* Corpo das seções */
 .section-body {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  width: 100%;
 }
 
-/* Vídeo responsivo 16:9 com centralização garantida */
+/* Vídeo responsivo 16:9 */
 .video-wrapper {
   position: relative;
   width: 100%;
-  max-width: 100%;
   padding-bottom: 56.25%; /* 16:9 */
   height: 0;
-  margin: 0 auto; /* Centraliza vídeos */
+  margin: 0 auto;
 }
 .video-wrapper iframe {
   position: absolute;
@@ -119,101 +128,82 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  border: 0;
+  border: none;
   border-radius: 4px;
 }
 
-/* Responsividade detalhada para telas menores (mobile) */
-@media (max-width: 480px) {
-  #content-container {
-    padding: 10px;
-  }
-  
-  #content-close-btn {
-    top: 8px;
-    right: 8px;
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
-  }
-
-  .content-inner, .content-wrapper {
-    gap: 20px;
-    padding: 0 10px;
-  }
-
-  .content-section {
-    padding: 12px;
-  }
-
-  .intro-section h1, .content-section h1 {
-    font-size: 1.4rem;
-    line-height: 1.2;
-  }
-
-  .intro-section p, .content-section p {
-    font-size: 0.95rem;
-    line-height: 1.4;
-  }
+/* Título dos vídeos */
+.video-title {
+  color: var(--ifrs-green);
+  font-size: 1.25rem;
+  margin-bottom: 8px;
 }
 
-/* Garantir que elementos nunca ultrapassem a largura total disponível */
+/* Introdução */
+.intro-section {
+  border: 2px solid var(--ifrs-green);
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.intro-section:hover {
+  transform: scale(1.02);
+  border-color: var(--ifrs-red);
+}
+.intro-section h1 {
+  font-size: 2rem;
+  color: var(--ifrs-green);
+  margin-bottom: 16px;
+}
+.intro-section p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--ifrs-black);
+}
+
+/* Imagens e embeds não ultrapassam largura */
 img, iframe, video, object {
   max-width: 100%;
   height: auto;
 }
 
-/* Estilização para a seção introdutória */
-.intro-section {
-  width: 100%;
-  max-width: 1200px;
-  background-color: #161b22;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  padding: 30px;
-  margin-bottom: 20px;
-  text-align: center;
-  transition: transform 0.2s;
-  box-sizing: border-box;
-}
-
-.intro-section:hover {
-  transform: scale(1.02);
-}
-
-.intro-section h1 {
-  font-size: 2rem;
-  color: #58a6ff;
-  margin-bottom: 16px;
-}
-
-.intro-section p {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  color: #c9d1d9;
-}
-
-/* Responsividade mobile */
+/* Mobile */
 @media (max-width: 480px) {
+  #content-container {
+    padding: 10px;
+  }
+  #content-close-btn {
+    top: 8px; right: 8px;
+    width: 28px; height: 28px;
+    font-size: 16px;
+  }
+  .content-inner, .content-wrapper {
+    gap: 20px;
+    padding: 0 10px;
+  }
+  .content-section {
+    padding: 12px;
+  }
   .intro-section {
     padding: 15px;
   }
-
   .intro-section h1 {
     font-size: 1.5rem;
   }
-
   .intro-section p {
     font-size: 1rem;
   }
 }
 
-/* Adiciona um respiro inferior */
-#content-container {
-  padding-top: 50px;      /* Espaço no topo */
-  padding-bottom: 50px;   /* Espaço no final (já discutido antes) */
-  box-sizing: border-box; /* Garante que o padding não quebre o layout */
+/* Logo IFRS no topo do conteúdo */
+.ifrs-logo-container {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-
-
+.ifrs-logo {
+  width: 150px;       /* ajuste conforme necessidade */
+  height: auto;
+  display: inline-block;
+}
