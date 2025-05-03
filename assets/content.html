@@ -18,7 +18,7 @@
 
       <!-- Seção introdutória -->
       <section class="intro-section">
-        <h1>Bem‑vindo ao Simulador de Vetores</h1>
+        <h1>Bem-vindo ao Simulador de Vetores</h1>
         <p>
           Visualize e interaja com vetores (arrays) de forma dinâmica. Use este ambiente para entender a
           estrutura, funcionamento e operações passo a passo em um ambiente gráfico intuitivo.
@@ -94,6 +94,15 @@
     </div>
   </div>
 
-  <script src="assets/overlay.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const overlay  = document.getElementById('content-container');
+      const closeBtn = document.getElementById('content-close-btn');
+
+      closeBtn.addEventListener('click', () => {
+        overlay.style.display = 'none';
+      });
+    });
+  </script>
 </body>
 </html>
