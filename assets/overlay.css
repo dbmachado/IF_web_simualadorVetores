@@ -1,17 +1,16 @@
-/* assets/overlay.css */
 /* Importa a tipografia oficial */
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap');
 
 /* Variáveis da paleta IFRS (Manual de Marca) */
 :root {
-  --ifrs-green: #2f9e41;   /* HEX #2f9e41 */
-  --ifrs-red:   #cd191e;   /* HEX #cd191e */
-  --ifrs-black: #000000;   /* HEX #000000 */
+  --ifrs-green: #2f9e41;
+  --ifrs-red:   #cd191e;
+  --ifrs-black: #000000;
   --ifrs-white: #ffffff;
   --ifrs-font:  'Open Sans', sans-serif;
 }
 
-/* Reset básico e configurações padrão */
+/* Reset básico */
 html, body {
   margin: 0;
   padding: 0;
@@ -23,7 +22,7 @@ html, body {
   color: var(--ifrs-black);
 }
 
-/* Overlay principal – fullscreen com safe‐areas e cor IFRS */
+/* Overlay principal */
 #content-container {
   position: fixed;
   inset: 0;
@@ -39,7 +38,7 @@ html, body {
   align-items: center;
 }
 
-/* Botão fechar – vermelho IFRS */
+/* Botão fechar */
 #content-close-btn {
   position: absolute;
   top: 16px;
@@ -58,22 +57,20 @@ html, body {
   transition: background 0.2s;
 }
 #content-close-btn:hover {
-  background: #b0171a; /* 10% mais escuro */
+  background: #b0171a;
 }
 
-/* Container Unity centralizado e responsivo */
-#unity-container {
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
+/* Logo IFRS */
+.ifrs-logo-container {
+  text-align: center;
+  margin-bottom: 20px;
 }
-#unity-canvas {
-  width: 100% !important;
-  height: auto !important;
-  display: block;
+.ifrs-logo {
+  width: 150px;
+  height: auto;
 }
 
-/* Container interno – fundo branco para destacar o conteúdo */
+/* Estrutura interna */
 .content-inner {
   width: 100%;
   max-width: 1200px;
@@ -87,13 +84,15 @@ html, body {
   margin: 0 auto;
 }
 
-/* Wrapper e seções gerais */
+/* Layout vertical: uma sessão por linha */
 .content-wrapper {
   display: flex;
   flex-direction: column;
   gap: 40px;
   width: 100%;
 }
+
+
 .content-section {
   background-color: var(--ifrs-white);
   border: 2px solid var(--ifrs-green);
@@ -107,20 +106,26 @@ html, body {
   border-color: var(--ifrs-red);
 }
 
-/* Corpo das seções */
+/* Título dos vídeos */
+.video-title {
+  color: var(--ifrs-green);
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
 .section-body {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* Vídeo responsivo 16:9 */
+/* Vídeo responsivo 16:9 dentro do card */
 .video-wrapper {
   position: relative;
   width: 100%;
-  padding-bottom: 56.25%; /* 16:9 */
+  padding-bottom: 56.25%;
   height: 0;
-  margin: 0 auto;
 }
 .video-wrapper iframe {
   position: absolute;
@@ -130,13 +135,6 @@ html, body {
   height: 100%;
   border: none;
   border-radius: 4px;
-}
-
-/* Título dos vídeos */
-.video-title {
-  color: var(--ifrs-green);
-  font-size: 1.25rem;
-  margin-bottom: 8px;
 }
 
 /* Introdução */
@@ -162,48 +160,18 @@ html, body {
   color: var(--ifrs-black);
 }
 
-/* Imagens e embeds não ultrapassam largura */
-img, iframe, video, object {
+/* Elementos multimídia */
+img, video, object {
   max-width: 100%;
   height: auto;
 }
 
-/* Mobile */
-@media (max-width: 480px) {
-  #content-container {
+/* Ajustes menores em tablets */
+@media (max-width: 768px) {
+  .content-inner {
     padding: 10px;
   }
-  #content-close-btn {
-    top: 8px; right: 8px;
-    width: 28px; height: 28px;
-    font-size: 16px;
-  }
-  .content-inner, .content-wrapper {
-    gap: 20px;
-    padding: 0 10px;
-  }
-  .content-section {
-    padding: 12px;
-  }
   .intro-section {
-    padding: 15px;
+    padding: 20px;
   }
-  .intro-section h1 {
-    font-size: 1.5rem;
-  }
-  .intro-section p {
-    font-size: 1rem;
-  }
-}
-
-/* Logo IFRS no topo do conteúdo */
-.ifrs-logo-container {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.ifrs-logo {
-  width: 150px;       /* ajuste conforme necessidade */
-  height: auto;
-  display: inline-block;
 }
