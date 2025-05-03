@@ -57,10 +57,10 @@ html, body {
 #content-close-btn {
   position: absolute;
   top: 16px;
-  right: 24px; /* <- dá espaço da borda/scroll */
+  right: 24px;
   background: var(--ifrs-green);
   color: #fff;
-  border: none;
+  border: 2px solid #fff; /* <- borda branca para contraste */
   font-size: 16px;
   padding: 8px 16px;
   border-radius: 8px;
@@ -68,9 +68,14 @@ html, body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
-  z-index: 100001; /* Garante que fique sempre visível */
+  transition: background 0.2s, border-color 0.2s;
+  z-index: 100001;
 }
+#content-close-btn:hover {
+  background: var(--ifrs-light-green);
+  border-color: #c9d1d9; /* leve tom cinza no hover */
+}
+
 
 
 
