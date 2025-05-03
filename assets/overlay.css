@@ -1,88 +1,104 @@
-/* Reset básico e configurações padrão */
+:root {
+  --ifrs-green: #00703C;
+  --ifrs-dark-green: #003528;
+  --ifrs-light-green: #8BC541;
+  --ifrs-white: #FFFFFF;
+  --ifrs-gray: #DDDDDD;
+  --ifrs-black: #1A1A1A;
+  --font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* Reset básico */
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   overflow-x: hidden;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-family);
+  background-color: var(--ifrs-dark-green);
+  color: var(--ifrs-white);
 }
 
-/* Overlay principal (fullscreen responsivo com safe areas) */
+/* Container geral */
 #content-container {
   position: fixed;
   inset: 0;
   z-index: 100000;
-  background-color: #0d1117;
-  color: #c9d1d9;
+  background-color: var(--ifrs-dark-green);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 20px env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  padding: 70px 20px 50px 20px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* Container Unity centralizado e responsivo */
-#unity-container {
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-}
-
-/* Canvas do Unity responsivo mantendo proporção */
-#unity-canvas {
-  width: 100% !important;
-  height: auto !important;
-  display: block;
-}
-
-/* Botão fechar (responsivo e acessível) */
-#content-close-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: #238636;
-  color: #fff;
-  border: none;
-  font-size: 20px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-}
-#content-close-btn:hover {
-  background: #2ea043;
-}
-
-/* Container interno responsivo (conteúdo principal) */
-.content-inner {
+/* Logo IFRS */
+#header-ifrs {
   width: 100%;
   max-width: 1200px;
   display: flex;
-  flex-direction: column;
-  gap: 40px;
-  margin: 0 auto;
-  box-sizing: border-box;
-  padding: 0 20px;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 30px;
 }
 
-/* Wrapper geral para conteúdos individuais */
+#header-ifrs img {
+  height: clamp(150px, 8vw, 100px);
+  max-width: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+
+/* Botão de fechar */
+#content-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 24px; /* <- dá espaço da borda/scroll */
+  background: var(--ifrs-green);
+  color: #fff;
+  border: none;
+  font-size: 16px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  z-index: 100001; /* Garante que fique sempre visível */
+}
+
+
+
+
+/* Estrutura principal */
+.content-inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* Bloco de vídeos */
 .content-wrapper {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 40px;
+  box-sizing: border-box;
 }
 
-/* Seções individuais com efeito visual responsivo */
+/* Seções principais */
 .content-section {
-  background-color: #161b22;
+  width: 100%;
+  max-width: 100%;
+  background-color: var(--ifrs-green);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   padding: 20px;
@@ -96,7 +112,7 @@ html, body {
   transform: scale(1.02);
 }
 
-/* Corpo das seções individuais (flexível e responsivo) */
+/* Bloco interno da seção */
 .section-body {
   display: flex;
   flex-direction: column;
@@ -104,14 +120,13 @@ html, body {
   width: 100%;
 }
 
-/* Vídeo responsivo 16:9 com centralização garantida */
+/* Vídeos responsivos 16:9 */
 .video-wrapper {
   position: relative;
   width: 100%;
-  max-width: 100%;
-  padding-bottom: 56.25%; /* 16:9 */
+  padding-bottom: 56.25%;
   height: 0;
-  margin: 0 auto; /* Centraliza vídeos */
+  margin: 0 auto;
 }
 .video-wrapper iframe {
   position: absolute;
@@ -123,51 +138,10 @@ html, body {
   border-radius: 4px;
 }
 
-/* Responsividade detalhada para telas menores (mobile) */
-@media (max-width: 480px) {
-  #content-container {
-    padding: 10px;
-  }
-  
-  #content-close-btn {
-    top: 8px;
-    right: 8px;
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
-  }
-
-  .content-inner, .content-wrapper {
-    gap: 20px;
-    padding: 0 10px;
-  }
-
-  .content-section {
-    padding: 12px;
-  }
-
-  .intro-section h1, .content-section h1 {
-    font-size: 1.4rem;
-    line-height: 1.2;
-  }
-
-  .intro-section p, .content-section p {
-    font-size: 0.95rem;
-    line-height: 1.4;
-  }
-}
-
-/* Garantir que elementos nunca ultrapassem a largura total disponível */
-img, iframe, video, object {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Estilização para a seção introdutória */
+/* Seção introdutória */
 .intro-section {
   width: 100%;
-  max-width: 1200px;
-  background-color: #161b22;
+  background-color: var(--ifrs-green);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   padding: 30px;
@@ -176,25 +150,43 @@ img, iframe, video, object {
   transition: transform 0.2s;
   box-sizing: border-box;
 }
-
 .intro-section:hover {
   transform: scale(1.02);
 }
-
 .intro-section h1 {
   font-size: 2rem;
-  color: #58a6ff;
+  color: var(--ifrs-light-green);
   margin-bottom: 16px;
 }
-
 .intro-section p {
   font-size: 1.1rem;
   line-height: 1.6;
-  color: #c9d1d9;
+  color: var(--ifrs-white);
 }
 
-/* Responsividade mobile */
+/* Responsivo para telas pequenas */
 @media (max-width: 480px) {
+  #content-container {
+    padding: 20px 10px;
+  }
+
+  #content-close-btn {
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+
+  .content-inner,
+  .content-wrapper {
+    gap: 20px;
+  }
+
+  .content-section {
+    padding: 12px;
+  }
+
   .intro-section {
     padding: 15px;
   }
@@ -208,12 +200,8 @@ img, iframe, video, object {
   }
 }
 
-/* Adiciona um respiro inferior */
-#content-container {
-  padding-top: 50px;      /* Espaço no topo */
-  padding-bottom: 50px;   /* Espaço no final (já discutido antes) */
-  box-sizing: border-box; /* Garante que o padding não quebre o layout */
+/* Segurança de largura */
+img, iframe, video, object {
+  max-width: 100%;
+  height: auto;
 }
-
-
-
