@@ -10,43 +10,56 @@
   <!-- Apenas o CSS unificado -->
   <link rel="stylesheet" href="assets/overlay.css">
 
-  <!-- Script para gerenciar overlay -->
+  <!-- Script para gerenciar overlay e fullscreen -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const overlay = document.getElementById('content-container');
       const inner   = document.getElementById('content-inner');
       const closeBtn= document.getElementById('content-close-btn');
 
+      // Função que exibe o overlay com o conteúdo de introdução
       function ShowSimulationOverlay() {
+        // Se estiver em fullscreen, sai para dar abertura ao overlay
         if (document.fullscreenElement) {
           document.exitFullscreen().catch(()=>{});
         }
-        fetch('assets/content.html', {cache:'no-cache'})
-          .then(r=> r.ok ? r.text() : Promise.reject(r.status))
-          .then(html=>{
+        fetch('assets/content.html', { cache: 'no-cache' })
+          .then(response => response.ok ? response.text() : Promise.reject(response.status))
+          .then(html => {
             inner.innerHTML = html;
             overlay.style.display = 'flex';
+            // Entra em fullscreen para o overlay no mobile
             overlay.requestFullscreen().catch(()=>{});
           })
           .catch(console.error);
       }
 
+      // Fecha o overlay e retorna ao canvas em fullscreen
       closeBtn.addEventListener('click', () => {
         inner.innerHTML = '';
         const canvas = document.getElementById('unity-canvas');
         canvas.requestFullscreen()
-          .then(()=>{
-            setTimeout(()=>{
+          .then(() => {
+            // Pequeno hack para forçar redraw no mobile
+            setTimeout(() => {
               canvas.style.transform = 'scale(1.001)';
-              setTimeout(()=> canvas.style.transform = 'scale(1)',50);
-            },100);
+              setTimeout(() => canvas.style.transform = 'scale(1)', 50);
+            }, 100);
           })
           .catch(console.warn);
-        setTimeout(()=> overlay.style.display = 'none', 300);
+        // Aguarda animação antes de ocultar
+        setTimeout(() => overlay.style.display = 'none', 300);
+      });
+
+      // Reabre o overlay automaticamente se o usuário sair do fullscreen (ex.: gesto de volta no mobile)
+      document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+          ShowSimulationOverlay();
+        }
       });
 
       window.ShowSimulationOverlay = ShowSimulationOverlay;
-      // inicia automaticamente
+      // Inicia automaticamente ao carregar
       overlay.style.display = 'flex';
       ShowSimulationOverlay();
     });
@@ -100,11 +113,11 @@
     var unityScript = document.createElement("script");
     unityScript.src = loaderUrl;
     unityScript.onload = function(){
-      createUnityInstance(canvas, config, (p)=> {
-        document.querySelector('#unity-progress-bar-full').style.width = 100 * p + '%';
-      }).then(instance=>{
-        document.querySelector('#unity-loading-bar').style.display='none';
-        document.querySelector('#unity-fullscreen-button').onclick = ()=> {
+      createUnityInstance(canvas, config, (progress) => {
+        document.querySelector('#unity-progress-bar-full').style.width = 100 * progress + '%';
+      }).then(instance => {
+        document.querySelector('#unity-loading-bar').style.display = 'none';
+        document.querySelector('#unity-fullscreen-button').onclick = () => {
           canvas.requestFullscreen().catch(()=>{});
         };
       }).catch(alert);
