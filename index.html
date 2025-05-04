@@ -19,35 +19,38 @@
 
         // Função para exibir overlay em fullscreen com conteúdo dinâmico
         function ShowSimulationOverlay() {
-  const overlay = document.getElementById('content-container');
-  const inner = document.getElementById('content-inner');
+          const overlay = document.getElementById('content-container');
+          const inner = document.getElementById('content-inner');
 
-  if (document.fullscreenElement) {
-    document.exitFullscreen().catch(() => {});
-  }
+          if (!overlay || !inner) return;
 
-  inner.innerHTML = '';
-  overlay.scrollTop = 0;
+          // Limpa o conteúdo e reseta o scroll
+          inner.innerHTML = '';
+          overlay.scrollTop = 0;
 
-  fetch('assets/content.html', { cache: 'no-cache' })
-    .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
-    .then(html => {
-      inner.innerHTML = html;
-      overlay.style.display = 'flex';
+          // Carrega o conteúdo dinâmico
+          fetch('assets/content.html', { cache: 'no-cache' })
+            .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
+            .then(html => {
+              inner.innerHTML = html;
+              overlay.style.display = 'flex';
 
-      // Aguarda o DOM renderizar antes de forçar o fullscreen
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (overlay.requestFullscreen) {
-            overlay.requestFullscreen().catch(err =>
-              console.warn('Erro ao entrar em fullscreen:', err)
-            );
-          }
-        });
-      });
-    })
-    .catch(err => console.error('Erro ShowSimulationOverlay:', err));
-}
+              // Aguarda renderização antes de tentar fullscreen
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                  
+                  // Evita fullscreen automático em dispositivos móveis
+                  if (!isMobile && overlay.requestFullscreen) {
+                    overlay.requestFullscreen().catch(err =>
+                      console.warn('Erro ao entrar em fullscreen:', err)
+                    );
+                  }
+                });
+              });
+            })
+            .catch(err => console.error('Erro ShowSimulationOverlay:', err));
+        }
 
 
         // Botão para fechar overlay e ativar fullscreen do Unity Canvas com repaint
