@@ -18,9 +18,11 @@ html, body {
   font-family: var(--font-family);
   background-color: var(--ifrs-dark-green);
   color: var(--ifrs-white);
+  -webkit-text-size-adjust: 100%; /* evita zoom de texto no iOS */
+  touch-action: manipulation;     /* melhora interação mobile */
 }
 
-/* Container geral */
+/* Overlay container geral */
 #content-container {
   position: fixed;
   inset: 0;
@@ -30,9 +32,15 @@ html, body {
   overflow-x: hidden;
   padding: 70px 20px 50px 20px;
   box-sizing: border-box;
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 /* Logo IFRS */
@@ -52,7 +60,6 @@ html, body {
   object-fit: contain;
 }
 
-
 /* Botão de fechar */
 #content-close-btn {
   position: absolute;
@@ -60,9 +67,9 @@ html, body {
   right: 24px;
   background: var(--ifrs-green);
   color: #fff;
-  border: 2px solid #fff; /* <- borda branca para contraste */
+  border: 2px solid #fff;
   font-size: 16px;
-  padding: 8px 16px;
+  padding: 12px;
   border-radius: 8px;
   cursor: pointer;
   display: inline-flex;
@@ -70,15 +77,14 @@ html, body {
   justify-content: center;
   transition: background 0.2s, border-color 0.2s;
   z-index: 100001;
+  min-width: 44px;
+  min-height: 44px;
+  touch-action: manipulation;
 }
 #content-close-btn:hover {
   background: var(--ifrs-light-green);
-  border-color: #c9d1d9; /* leve tom cinza no hover */
+  border-color: #c9d1d9;
 }
-
-
-
-
 
 /* Estrutura principal */
 .content-inner {
@@ -178,8 +184,8 @@ html, body {
   #content-close-btn {
     top: 8px;
     right: 8px;
-    width: 28px;
-    height: 28px;
+    width: auto;
+    height: auto;
     font-size: 16px;
   }
 
