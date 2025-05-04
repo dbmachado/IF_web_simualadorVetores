@@ -23,32 +23,35 @@
           const overlay = document.getElementById('content-container');
           const inner = document.getElementById('content-inner');
 
-          if (document.fullscreenElement && !isMobile()) {
-            document.exitFullscreen().catch(() => {});
+          function mostrarOverlay() {
+            fetch('assets/content.html', { cache: 'no-cache' })
+              .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
+              .then(html => {
+                inner.innerHTML = html;
+
+                overlay.style.display = 'flex';
+                overlay.style.visibility = 'visible';
+                overlay.style.pointerEvents = 'auto';
+                overlay.style.zIndex = '9999';
+              })
+              .catch(err => console.error('Erro ShowSimulationOverlay:', err));
           }
 
-          inner.innerHTML = '';
-          overlay.scrollTop = 0;
-
-          fetch('assets/content.html', { cache: 'no-cache' })
-            .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
-            .then(html => {
-              inner.innerHTML = html;
-
-              requestAnimationFrame(() => {
-                overlay.style.display = 'flex';
-
-                if (!isMobile() && overlay.requestFullscreen) {
-                  requestAnimationFrame(() => {
-                    overlay.requestFullscreen().catch(err =>
-                      console.warn('Erro ao entrar em fullscreen:', err)
-                    );
-                  });
-                }
-              });
-            })
-            .catch(err => console.error('Erro ShowSimulationOverlay:', err));
+          if (document.fullscreenElement) {
+            document.exitFullscreen()
+              .then(() => {
+                document.addEventListener('fullscreenchange', () => {
+                  if (!document.fullscreenElement) {
+                    mostrarOverlay();
+                  }
+                }, { once: true }); // remove o listener depois
+              })
+              .catch(() => mostrarOverlay());
+          } else {
+            mostrarOverlay();
+          }
         }
+
 
         closeBtn.addEventListener('click', () => {
           inner.innerHTML = '';
