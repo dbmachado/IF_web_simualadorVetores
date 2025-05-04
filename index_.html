@@ -3,63 +3,68 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <!-- Responsividade e safe areas -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
     <title>Unity Web Player | IFVetores</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="stylesheet" href="assets/overlay.css">
 
-    <!-- Script para gerenciar overlay -->
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const overlay = document.getElementById('content-container');
         const inner = document.getElementById('content-inner');
         const closeBtn = document.getElementById('content-close-btn');
 
-        // Função para exibir overlay em fullscreen com conteúdo dinâmico
+        function isMobile() {
+          return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        }
+
         function ShowSimulationOverlay() {
-  const overlay = document.getElementById('content-container');
-  const inner = document.getElementById('content-inner');
+          const overlay = document.getElementById('content-container');
+          const inner = document.getElementById('content-inner');
 
-  if (document.fullscreenElement) {
-    document.exitFullscreen().catch(() => {});
-  }
+          function mostrarOverlay() {
+            fetch('assets/content.html', { cache: 'no-cache' })
+              .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
+              .then(html => {
+                inner.innerHTML = html;
 
-  inner.innerHTML = '';
-  overlay.scrollTop = 0;
-
-  fetch('assets/content.html', { cache: 'no-cache' })
-    .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
-    .then(html => {
-      inner.innerHTML = html;
-      overlay.style.display = 'flex';
-
-      // Aguarda o DOM renderizar antes de forçar o fullscreen
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (overlay.requestFullscreen) {
-            overlay.requestFullscreen().catch(err =>
-              console.warn('Erro ao entrar em fullscreen:', err)
-            );
+                overlay.style.display = 'flex';
+                overlay.style.visibility = 'visible';
+                overlay.style.pointerEvents = 'auto';
+                overlay.style.zIndex = '9999';
+              })
+              .catch(err => console.error('Erro ShowSimulationOverlay:', err));
           }
-        });
-      });
-    })
-    .catch(err => console.error('Erro ShowSimulationOverlay:', err));
-}
-        // Botão para fechar overlay e ativar fullscreen do Unity Canvas com repaint
+
+          if (document.fullscreenElement) {
+            document.exitFullscreen()
+              .then(() => {
+                document.addEventListener('fullscreenchange', () => {
+                  if (!document.fullscreenElement) {
+                    mostrarOverlay();
+                  }
+                }, { once: true }); // remove o listener depois
+              })
+              .catch(() => mostrarOverlay());
+          } else {
+            mostrarOverlay();
+          }
+        }
+
+
         closeBtn.addEventListener('click', () => {
           inner.innerHTML = '';
 
           const unityCanvas = document.getElementById('unity-canvas');
           if (unityCanvas.requestFullscreen) {
             unityCanvas.requestFullscreen().then(() => {
-              // Força repaint no canvas após fullscreen
-              setTimeout(() => {
-                unityCanvas.style.transform = 'scale(1.001)';
-                setTimeout(() => unityCanvas.style.transform = 'scale(1)', 50);
-              }, 100);
+              requestAnimationFrame(() => {
+                unityCanvas.style.opacity = '0.99';
+                requestAnimationFrame(() => {
+                  unityCanvas.style.opacity = '1';
+                });
+              });
             }).catch(err =>
               console.warn('Erro ao entrar em fullscreen:', err)
             );
@@ -70,7 +75,6 @@
 
         window.ShowSimulationOverlay = ShowSimulationOverlay;
 
-        // Garante que o overlay seja o primeiro elemento visível ao carregar
         overlay.style.display = 'flex';
         ShowSimulationOverlay();
       });
@@ -78,13 +82,13 @@
   </head>
 
   <body>
-    <!-- Overlay para exibição de conteúdo externo -->
-    <div id="content-container" class="overlay" style="display:flex;">
+    <!-- Overlay -->
+    <div id="content-container" class="overlay" style="display: flex;">
       <button id="content-close-btn" class="overlay-close">×</button>
       <div id="content-inner"></div>
     </div>
 
-    <!-- Container principal do Unity -->
+    <!-- Unity -->
     <div id="unity-container" class="unity-desktop">
       <canvas id="unity-canvas" tabindex="-1"></canvas>
       <div id="unity-loading-bar">
@@ -101,12 +105,11 @@
       </div>
     </div>
 
-    <!-- Script de inicialização do Unity -->
+    <!-- Unity Bootstrap -->
     <script>
       var canvas = document.querySelector("#unity-canvas");
       window.unityInstance = null;
 
-      // Função para exibir mensagens do Unity
       function unityShowBanner(msg, type) {
         var warningBanner = document.querySelector("#unity-warning");
         function updateBannerVisibility() {
@@ -126,7 +129,6 @@
         updateBannerVisibility();
       }
 
-      // Configurações e carregamento do Unity
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/IF_web_simualadorVetores.loader.js";
       var config = {
