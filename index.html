@@ -39,7 +39,7 @@
               requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-                  
+
                   // Evita fullscreen automático em dispositivos móveis
                   if (!isMobile && overlay.requestFullscreen) {
                     overlay.requestFullscreen().catch(err =>
@@ -51,7 +51,6 @@
             })
             .catch(err => console.error('Erro ShowSimulationOverlay:', err));
         }
-
 
         // Botão para fechar overlay e ativar fullscreen do Unity Canvas com repaint
         closeBtn.addEventListener('click', () => {
