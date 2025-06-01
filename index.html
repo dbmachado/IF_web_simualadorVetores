@@ -156,7 +156,7 @@
          =========================== -->
 
     <!-- ===========================
-         (2) SCRIPT ORIGINAL DO OVERLAY
+         (2) SCRIPT ORIGINAL DO OVERLAY (sem alterações)
          =========================== -->
     <script>
       document.addEventListener("DOMContentLoaded", () => {
@@ -164,9 +164,6 @@
         const inner = document.getElementById("content-inner");
         const closeBtn = document.getElementById("content-close-btn");
 
-        /**
-         * Abre o overlay-página
-         */
         function ShowSimulationOverlay() {
           fetch("assets/content.html", { cache: "no-cache" })
             .then((resp) => (resp.ok ? resp.text() : Promise.reject(resp.status)))
@@ -179,9 +176,6 @@
             .catch((err) => console.error("Erro ShowSimulationOverlay:", err));
         }
 
-        /**
-         * Fecha o overlay e restabelece scroll do body/html.
-         */
         function closeOverlay() {
           inner.innerHTML = "";
           overlay.classList.remove("active");
