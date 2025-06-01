@@ -13,7 +13,7 @@
     <link rel="shortcut icon" href="TemplateData/favicon.ico" />
     <link rel="stylesheet" href="TemplateData/style.css" />
 
-    <!-- CSS para o “overlay-página” -->
+    <!-- CSS do overlay -->
     <link rel="stylesheet" href="assets/overlay.css" />
 
     <script>
@@ -23,56 +23,35 @@
         const closeBtn = document.getElementById("content-close-btn");
 
         /**
-         * Abre o overlay-página (preenche 100% da tela e roda verticalmente).
-         * Faz fetch de content.html e injeta em #content-inner.
-         * Desabilita scroll do body para não haver “duas barras”.
+         * Abre o overlay-página: carrega content.html, injeta em #content-inner,
+         * adiciona .active e tira scroll do body/html.
          */
         function ShowSimulationOverlay() {
-          function mostrarOverlay() {
-            fetch("assets/content.html", { cache: "no-cache" })
-              .then((resp) => (resp.ok ? resp.text() : Promise.reject(resp.status)))
-              .then((html) => {
-                inner.innerHTML = html;
-                overlay.classList.add("active");
-                // Desabilita scroll do body para que só o overlay role
-                document.body.style.overflow = "hidden";
-              })
-              .catch((err) => console.error("Erro ShowSimulationOverlay:", err));
-          }
-
-          if (document.fullscreenElement) {
-            document
-              .exitFullscreen()
-              .then(() => {
-                document.addEventListener(
-                  "fullscreenchange",
-                  () => {
-                    if (!document.fullscreenElement) mostrarOverlay();
-                  },
-                  { once: true }
-                );
-              })
-              .catch(() => mostrarOverlay());
-          } else {
-            mostrarOverlay();
-          }
+          fetch("assets/content.html", { cache: "no-cache" })
+            .then((resp) => (resp.ok ? resp.text() : Promise.reject(resp.status)))
+            .then((html) => {
+              inner.innerHTML = html;
+              overlay.classList.add("active");
+              document.documentElement.style.overflow = "hidden";
+              document.body.style.overflow = "hidden";
+            })
+            .catch((err) => console.error("Erro ShowSimulationOverlay:", err));
         }
 
         /**
-         * Fecha o overlay-página e limpa o conteúdo injetado.
-         * Reabilita o scroll do body.
+         * Fecha o overlay e reabilita scroll do body/html.
          */
         function closeOverlay() {
           inner.innerHTML = "";
           overlay.classList.remove("active");
-          // Reabilita scroll no body
+          document.documentElement.style.overflow = "auto";
           document.body.style.overflow = "auto";
         }
 
         closeBtn.addEventListener("click", closeOverlay);
         window.ShowSimulationOverlay = ShowSimulationOverlay;
 
-        // Se quiser abrir automaticamente ao carregar (por exemplo, debug):
+        // Se quiser abrir automaticamente ao carregar:
         // ShowSimulationOverlay();
       });
     </script>
@@ -80,22 +59,12 @@
 
   <body>
     <!-- ================================
-         1) OVERLAY-PÁGINA (inicialmente oculto)
+         1) UNITY CONTAINER – ocupa 100% da tela (fixed, por trás)
          ================================= -->
-    <div id="content-container" class="overlay">
-      <button id="content-close-btn" class="close-btn">×</button>
-      <!-- Todo o conteúdo de content.html será injetado aqui -->
-      <div id="content-inner" class="content-inner"></div>
-    </div>
-
-    <!-- ================================
-         2) ÁREA DO UNITY WEBGL
-         ================================= -->
-    <div id="unity-container" class="unity-desktop">
+    <div id="unity-container" class="unity-fixed">
       <canvas
         id="unity-canvas"
         tabindex="-1"
-        style="background: #000; width: 100vw; height: 100vh;"
       ></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
@@ -109,6 +78,14 @@
         <div id="unity-fullscreen-button"></div>
         <div id="unity-build-title">IFVetores</div>
       </div>
+    </div>
+
+    <!-- ================================
+         2) OVERLAY-PÁGINA (sempre fixed, invisível até .active)
+         ================================= -->
+    <div id="content-container" class="overlay">
+      <button id="content-close-btn" class="close-btn">×</button>
+      <div id="content-inner" class="content-inner"></div>
     </div>
 
     <!-- ================================
@@ -156,8 +133,10 @@
         showBanner: unityShowBanner,
       };
 
+      // Exibe a barra de loading até o Unity inicializar
       document.querySelector("#unity-loading-bar").style.display = "block";
 
+      // Carrega o loader.js do Unity e cria a instância
       var unityScript = document.createElement("script");
       unityScript.src = loaderUrl;
       unityScript.onload = function () {

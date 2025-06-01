@@ -20,7 +20,6 @@
   -webkit-touch-callout: none !important;
 }
 
-/* Remove outline de foco dos elementos clicáveis no overlay */
 #content-container button,
 #content-container a,
 #content-container input,
@@ -38,7 +37,7 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden; /* Impede scroll no body */
+  overflow: hidden; /* Impede scroll do body */
   font-family: var(--font-family);
   background-color: var(--ifrs-dark-green);
   color: var(--ifrs-white);
@@ -47,15 +46,23 @@ body {
 }
 
 /* ========================
-   CANVAS DO UNITY – sem highlight ao clicar
+   UNITY CONTAINER (sempre full-screen)
    ======================== */
+.unity-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* atrás do overlay */
+  overflow: hidden;
+}
+
 #unity-canvas {
-  width: 100vw;
-  height: 100vh;
-  max-width: 100vw;
-  max-height: 100vh;
+  width: 100%;
+  height: 100%;
   display: block;
-  margin: 0 auto;
+  outline: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -64,42 +71,36 @@ body {
 }
 
 /* ========================
-   OVERLAY-PÁGINA (Fundo sólido + scroll interno)
+   OVERLAY-PÁGINA (full-screen + scroll único)
    ======================== */
-/* Container do overlay – ocupa toda a tela e fica oculto */
 #content-container {
   position: fixed;
-  inset: 0; /* top:0; right:0; bottom:0; left:0; */
-  background-color: var(--ifrs-dark-green); /* verde-escuro sólido */
-  display: none; /* oculto até receber .active */
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  overflow-y: auto; /* A própria página “overlay” é rolável */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--ifrs-dark-green);
+  display: none; /* só aparece com .active */
+  overflow-y: auto;
+  overflow-x: hidden;
   z-index: 100000;
-  padding-top: 80px; /* Espaço para o botão fechar (fingindo header) */
-  box-sizing: border-box;
 }
 
-/* Quando adicionar .active, exibe em flex para ocupar 100% da tela */
 #content-container.active {
-  display: flex;
+  display: block;
 }
 
-/* ========================
-   BOTÃO DE FECHAR
-   ======================== */
+/* Botão fechar */
 .close-btn {
   position: fixed;
-  top: 16px;
-  right: 16px;
+  top: 12px;
+  right: 12px;
   background: var(--ifrs-green);
   color: var(--ifrs-white);
   border: 2px solid var(--ifrs-white);
-  font-size: 28px;
-  line-height: 28px;
-  width: 44px;
-  height: 44px;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -111,108 +112,106 @@ body {
 
 .close-btn:hover {
   background: var(--ifrs-light-green);
-  transform: scale(1.1);
-}
-
-.close-btn:focus {
-  outline: none !important;
+  transform: scale(1.05);
 }
 
 /* ========================
-   CONTEÚDO (comportando-se como página responsiva)
+   CONTEÚDO (agora centralizado e mais compacto)
    ======================== */
+/* Limita a largura para que não estique demais em telas largas */
 .content-inner {
   width: 100%;
-  max-width: 100%; /* ocupa 100% em qualquer largura */
-  padding: 20px;
+  max-width: 800px;       /* largura máxima 800px */
+  margin: 0 auto;         /* centraliza horizontalmente */
+  padding: 16px 12px;     /* padding menor */
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 24px;              /* gap mais suave */
 }
 
-/* Cabeçalho com logo IFRS – centralizado */
+/* Cabeçalho IFRS */
 #header-ifrs {
   width: 100%;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 #header-ifrs img {
-  height: 100px;
+  height: 80px;       /* menor do que antes */
   max-width: 90%;
   object-fit: contain;
 }
 
-/* Seção introdutória – fundo verde IFRS */
+/* Seção introdutória */
 .intro-section {
   background-color: var(--ifrs-green);
-  border-radius: 8px;
-  padding: 30px;
+  border-radius: 6px;
+  padding: 20px;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
   color: var(--ifrs-white);
   transition: transform 0.2s;
 }
 
 .intro-section:hover {
-  transform: scale(1.02);
+  transform: scale(1.01);
 }
 
 .intro-section h1 {
-  font-size: 32px;
+  font-size: 28px;      /* levemente menor */
   color: var(--ifrs-light-green);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .intro-section p {
-  font-size: 18px;
-  line-height: 1.6;
+  font-size: 16px;
+  line-height: 1.5;
   color: var(--ifrs-white);
 }
 
-/* Wrapper para agrupar as seções de vídeo */
+/* Wrapper de seções de vídeo */
 .content-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 32px;
 }
 
-/* Cada seção de vídeo – fundo verde IFRS */
+/* Cada seção de vídeo */
 .content-section {
   background-color: var(--ifrs-green);
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  padding: 16px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
   color: var(--ifrs-white);
   transition: transform 0.2s;
 }
 
 .content-section:hover {
-  transform: scale(1.02);
+  transform: scale(1.01);
 }
 
 .content-section h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 20px;      /* menor que antes */
+  margin-bottom: 16px;
   color: var(--ifrs-light-green);
 }
 
 .section-body {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
-/* Vídeo responsivo (16:9), com fundo preto atrás */
+/* Vídeo responsivo (16:9) */
 .video-wrapper {
   position: relative;
   width: 100%;
-  padding-bottom: 56.25%; /* 16:9 */
+  padding-bottom: 56.25%;
   height: 0;
   overflow: hidden;
   border-radius: 4px;
-  background-color: #000; /* fundo preto */
+  background-color: #000;
 }
 
 .video-wrapper iframe {
@@ -225,51 +224,21 @@ body {
 }
 
 /* ========================
-   MEDIA QUERIES PARA RESPONSIVO
+   MEDIA QUERIES (responsividade)
    ======================== */
 @media (max-width: 1024px) {
   .content-inner {
-    padding: 16px;
-    gap: 32px;
+    max-width: 90%;
+    padding: 16px 10px;
+    gap: 20px;
   }
 
   #header-ifrs img {
-    height: 80px;
+    height: 70px;
   }
 
   .intro-section {
-    padding: 24px;
-  }
-
-  .intro-section h1 {
-    font-size: 28px;
-  }
-
-  .intro-section p {
-    font-size: 16px;
-  }
-
-  .content-section {
     padding: 18px;
-  }
-
-  .content-section h2 {
-    font-size: 22px;
-  }
-}
-
-@media (max-width: 768px) {
-  .content-inner {
-    padding: 12px;
-    gap: 28px;
-  }
-
-  #header-ifrs img {
-    height: 60px;
-  }
-
-  .intro-section {
-    padding: 20px;
   }
 
   .intro-section h1 {
@@ -277,35 +246,63 @@ body {
   }
 
   .intro-section p {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .content-section {
-    padding: 16px;
+    padding: 14px;
   }
 
   .content-section h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
 }
 
-@media (max-width: 480px) {
-  html,
-  body {
-    overflow: hidden; /* mantém o body sem scroll */
-  }
-
+@media (max-width: 768px) {
   .content-inner {
-    padding: 10px;
-    gap: 24px;
+    max-width: 100%;
+    padding: 12px 8px;
+    gap: 16px;
   }
 
   #header-ifrs img {
-    height: 50px;
+    height: 60px;
   }
 
   .intro-section {
     padding: 16px;
+  }
+
+  .intro-section h1 {
+    font-size: 22px;
+  }
+
+  .intro-section p {
+    font-size: 14px;
+  }
+
+  .content-section {
+    padding: 12px;
+  }
+
+  .content-section h2 {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-inner {
+    padding: 10px 6px;
+    gap: 12px;
+  }
+
+  #header-ifrs img {
+    height: 50px;
+    margin-bottom: 12px;
+  }
+
+  .intro-section {
+    padding: 14px;
   }
 
   .intro-section h1 {
@@ -317,11 +314,11 @@ body {
   }
 
   .content-section {
-    padding: 12px;
+    padding: 10px;
   }
 
   .content-section h2 {
-    font-size: 18px;
+    font-size: 14px;
   }
 
   .close-btn {
@@ -334,7 +331,7 @@ body {
   }
 }
 
-/* Garante que mídias (iframe, img) não ultrapassem a largura do container */
+/* Garante que iframe, img, video não ultrapassem a largura máxima */
 img,
 iframe,
 video,
