@@ -15,10 +15,6 @@
         const inner = document.getElementById('content-inner');
         const closeBtn = document.getElementById('content-close-btn');
 
-        function isMobile() {
-          return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        }
-
         function ShowSimulationOverlay() {
           const overlay = document.getElementById('content-container');
           const inner = document.getElementById('content-inner');
@@ -28,7 +24,6 @@
               .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
               .then(html => {
                 inner.innerHTML = html;
-
                 overlay.style.display = 'flex';
                 overlay.style.visibility = 'visible';
                 overlay.style.pointerEvents = 'auto';
@@ -89,7 +84,7 @@
 
     <!-- Unity -->
     <div id="unity-container" class="unity-desktop">
-      <!-- Alterado tabindex para "0" -->
+      <!-- Canvas deve ter tabindex="0" para receber foco no touch -->
       <canvas id="unity-canvas" tabindex="0"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
@@ -162,8 +157,6 @@
       document.body.appendChild(unityScript);
     </script>
     <!-- Fim do Unity Bootstrap -->
-
-    <!-- Inclui o script para capturar texto no WebGL mobile -->
     <script src="webgl-mobile-input.js"></script>
   </body>
 </html>
