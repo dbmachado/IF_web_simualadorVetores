@@ -2,46 +2,52 @@
 <html lang="pt-br">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+    />
     <title>Unity WebGL | IFVetores</title>
 
     <!-- Ícone e CSS padrão do Unity -->
     <link rel="shortcut icon" href="TemplateData/favicon.ico" />
     <link rel="stylesheet" href="TemplateData/style.css" />
 
-    <!-- CSS do seu overlay original -->
+    <!-- CSS do overlay original (mantido) -->
     <link rel="stylesheet" href="assets/overlay.css" />
 
-    <!-- ======================================
-         CSS DO PROMPT (agora ficará dentro de #unity-wrapper)
-         ====================================== -->
+    <!-- =========================================
+         CSS DO PROMPT (dentro do wrapper)
+         ========================================= -->
     <style>
+      /* O wrapper contém canvas + prompt juntos */
       #unity-wrapper {
         position: fixed;
         inset: 0;
-      }
-
-      /* O canvas permanece dentro do wrapper: */
-      #unity-canvas {
-        width: 100%;
-        height: 100%;
-      }
-
-      /* O prompt também está dentro do wrapper, por isso pode aparecer no full-screen */
-      #unityPromptContainer {
-        display: none !important;
-        position: absolute;
-        inset: 0;                /* top:0; left:0; right:0; bottom:0; */
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 99999 !important;
-        pointer-events: all;
-        align-items: center;
-        justify-content: center;
-        /* para funcionar como flex container: */
         display: flex;
         flex-direction: column;
       }
 
+      /* O canvas fica 100% dentro do wrapper */
+      #unity-canvas {
+        flex: 1;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Container do prompt: invisível até ser mostrado */
+      #unityPromptContainer {
+        display: none !important;
+        position: absolute;
+        inset: 0; /* top:0; left:0; right:0; bottom:0 */
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 99999 !important;
+        pointer-events: all; /* capturar toques no próprio prompt */
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Caixinha branca centralizada a 30% do topo */
       #unityPromptBox {
         position: relative;
         top: 30vh;
@@ -97,85 +103,78 @@
       }
     </style>
 
-    <!-- ======================================
-         JS DO PROMPT (antes do restante do overlay)
-         ====================================== -->
+    <!-- =========================================
+         SCRIPT JS DO PROMPT (antes do overlay)
+         ========================================= -->
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        // 1) Localiza elementos
+        // 1) Referências
         const wrapper = document.getElementById("unity-wrapper");
         const container = document.getElementById("unityPromptContainer");
         const messageEl = document.getElementById("unityPromptMessage");
         const inputEl = document.getElementById("unityPromptInput");
         const okBtn = document.getElementById("unityPromptOk");
         const cancelBtn = document.getElementById("unityPromptCancel");
-        const unityCanvas = document.getElementById("unity-canvas");
 
         let currentGameObject = "";
         let currentMethodName = "";
 
-        // 2) Função global que o Unity chama
-        window.ShowUnityPrompt = function (
-          gameObjectName,
-          methodName,
-          defaultText,
-          messageText
+        // 2) Função global que Unity chama para mostrar o prompt
+        window.ShowUnityPrompt = function(
+          gameObjectName, methodName, defaultText, messageText
         ) {
           currentGameObject = gameObjectName;
           currentMethodName = methodName;
           messageEl.textContent = messageText || "";
           inputEl.value = defaultText || "";
 
-          // Desabilita clique direto no canvas (já que agora está num wrapper)
-          if (unityCanvas) {
-            unityCanvas.style.pointerEvents = "none";
-          }
+          console.log(">> ShowUnityPrompt chamado — exibindo prompt");
 
-          // Exibe o container do prompt
+          // Desabilita clique no wrapper (e, portanto, no canvas também)
+          wrapper.style.pointerEvents = "none";
+
+          // Força exibir o prompt
           container.style.setProperty("display", "flex", "important");
           inputEl.focus();
         };
 
-        // 3) Botão OK → envia o texto ao Unity e “ressuscita” o canvas
+        // 3) OK: envia texto ao Unity e reabilita clique no wrapper
         okBtn.addEventListener("click", () => {
+          console.log(">> OK pressionado — ocultando prompt");
           const texto = inputEl.value;
           container.style.setProperty("display", "none", "important");
-          if (unityCanvas) {
-            unityCanvas.style.pointerEvents = "auto";
-          }
-          if (
-            typeof gameInstance !== "undefined" &&
-            currentGameObject &&
-            currentMethodName
-          ) {
+          wrapper.style.pointerEvents = "auto";
+
+          if (typeof gameInstance !== "undefined"
+              && currentGameObject
+              && currentMethodName) {
             gameInstance.SendMessage(
-              currentGameObject,
-              currentMethodName,
-              texto
+              currentGameObject, currentMethodName, texto
             );
           }
         });
 
-        // 4) Botão Cancelar → envia string vazia e reabilita o canvas
+        // 4) Cancel: envia string vazia e reabilita clique no wrapper
         cancelBtn.addEventListener("click", () => {
+          console.log(">> Cancel pressionado — ocultando prompt");
           container.style.setProperty("display", "none", "important");
-          if (unityCanvas) {
-            unityCanvas.style.pointerEvents = "auto";
-          }
-          if (
-            typeof gameInstance !== "undefined" &&
-            currentGameObject &&
-            currentMethodName
-          ) {
-            gameInstance.SendMessage(currentGameObject, currentMethodName, "");
+          wrapper.style.pointerEvents = "auto";
+
+          if (typeof gameInstance !== "undefined"
+              && currentGameObject
+              && currentMethodName) {
+            gameInstance.SendMessage(
+              currentGameObject, currentMethodName, ""
+            );
           }
         });
       });
     </script>
 
-    <!-- ======================================
-         MANTENHA AQUI SEU SCRIPT ORIGINAL DO OVERLAY (ShowSimulationOverlay)
-         ====================================== -->
+    <!-- =========================================
+         MANTENHA AQUI SEU SCRIPT ORIGINAL DO OVERLAY
+         (ShowSimulationOverlay / closeOverlay)
+         ========================================= -->
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const overlay = document.getElementById("content-container");
@@ -208,9 +207,9 @@
   </head>
 
   <body>
-    <!-- ======================================
-         1) O “wrapper” que engloba canvas e prompt
-         ====================================== -->
+    <!-- ==============================
+         1) WRAPPER QUE GUARDA CANVAS + PROMPT
+         ============================== -->
     <div id="unity-wrapper" class="unity-fixed">
       <canvas id="unity-canvas" tabindex="-1"></canvas>
       <div id="unity-loading-bar">
@@ -226,9 +225,9 @@
         <div id="unity-build-title">IFVetores</div>
       </div>
 
-      <!-- ======================================
-           2) O prompt fica dentro do mesmo wrapper
-           ====================================== -->
+      <!-- ==============================
+           2) O PROMPT FICA AQUI, FILHO DO WRAPPER
+           ============================== -->
       <div id="unityPromptContainer">
         <div id="unityPromptBox">
           <div id="unityPromptMessage">Digite o valor:</div>
@@ -237,24 +236,25 @@
             <button id="unityPromptCancel" class="unityPromptBtn">
               Cancelar
             </button>
-            <button id="unityPromptOk" class="unityPromptBtn">OK</button>
+            <button id="unityPromptOk" class="unityPromptBtn">
+              OK
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ======================================
-         3) O overlay-página original (ShowSimulationOverlay)
-         ====================================== -->
+    <!-- ==============================
+         3) OVERLAY‐PÁGINA ORIGINAL (ShowSimulationOverlay)
+         ============================== -->
     <div id="content-container" class="overlay">
       <button id="content-close-btn" class="close-btn">×</button>
       <div id="content-inner" class="content-inner"></div>
     </div>
 
-    <!-- ======================================
-         4) BOOTSTRAP DO UNITY WEBGL – sem alterações,
-         mas pedindo fullscreen no “wrapper” abaixo
-         ====================================== -->
+    <!-- ==============================
+         4) BOOTSTRAP DO UNITY WEBGL (SEM ALTERAÇÕES, exceto o fullscreen no wrapper)
+         ============================== -->
     <script>
       var canvas = document.querySelector("#unity-canvas");
       var wrapper = document.querySelector("#unity-wrapper");
@@ -312,7 +312,7 @@
             document.querySelector("#unity-loading-bar").style.display =
               "none";
 
-            // <-- aqui pedimos fullscreen no wrapper, não no canvas puro -->
+            // → agora o clique em fullscreen afeta o WRAPPER, não só o canvas
             document.querySelector("#unity-fullscreen-button").onclick = () => {
               wrapper.requestFullscreen().catch(() => {});
             };
