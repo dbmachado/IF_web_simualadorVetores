@@ -7,206 +7,19 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
     />
-    <title>Unity WebGL | IFVetores</title>
+    <title>Unity Web Player | IFVetores</title>
 
-    <!-- 1) CSS PADRÃO DA UNITY (não remova) -->
+    <!-- Ícone e CSS padrão da Unity -->
     <link rel="shortcut icon" href="TemplateData/favicon.ico" />
     <link rel="stylesheet" href="TemplateData/style.css" />
 
-    <!-- 2) CSS DO OVERLAY ORIGINAL (não remova) -->
+    <!-- Se você estiver usando overlay, mantenha apenas isso: -->
     <link rel="stylesheet" href="assets/overlay.css" />
-
-    <!-- 3) CSS DO PROMPT (sempre depois do style.css do Unity) -->
-    <style>
-      /* 3.1) o wrapper agrupa tudo que vai para full-screen */
-      #unity-wrapper {
-        position: fixed;
-        inset: 0; /* top:0; left:0; right:0; bottom:0 */
-        display: flex;
-        flex-direction: column;
-      }
-
-      /* 3.2) o canvas ocupa todo espaço do wrapper */
-      #unity-canvas {
-        flex: 1;
-        width: 100%;
-        height: 100%;
-      }
-
-      /* 3.3) o prompt ficará dentro do wrapper, para não “sumir” em full-screen */
-      #unityPromptContainer {
-        display: none !important; /* começa oculto */
-        position: absolute;
-        inset: 0; /* cobre todo o wrapper */
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 99999 !important; /* acima do canvas e de qualquer overlay */
-        pointer-events: all; /* capturar clique/tap */
-        align-items: center;
-        justify-content: center;
-      }
-
-      /* 3.4) a caixinha branca central */
-      #unityPromptBox {
-        position: relative;
-        top: 30vh; /* 30% do topo da viewport */
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80%;
-        max-width: 300px;
-        background-color: #fff;
-        border-radius: 8px;
-        padding: 16px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        display: flex;
-        flex-direction: column;
-      }
-
-      #unityPromptMessage {
-        margin-bottom: 12px;
-        font-size: 16px;
-        color: #333;
-        text-align: left;
-      }
-
-      #unityPromptInput {
-        padding: 8px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        margin-bottom: 12px;
-      }
-
-      #unityPromptButtons {
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-      }
-
-      .unityPromptBtn {
-        padding: 8px 12px;
-        font-size: 14px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-
-      #unityPromptOk {
-        background-color: #0099ff;
-        color: #fff;
-      }
-
-      #unityPromptCancel {
-        background-color: #ddd;
-        color: #333;
-      }
-    </style>
-
-    <!-- 4) SCRIPT DO PROMPT (sempre depois do CSS do prompt) -->
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        // 4.1) Referências
-        const wrapper = document.getElementById("unity-wrapper");
-        const container = document.getElementById("unityPromptContainer");
-        const messageEl = document.getElementById("unityPromptMessage");
-        const inputEl = document.getElementById("unityPromptInput");
-        const okBtn = document.getElementById("unityPromptOk");
-        const cancelBtn = document.getElementById("unityPromptCancel");
-
-        let currentGameObject = "";
-        let currentMethodName = "";
-
-        // 4.2) Função global para Unity chamar
-        window.ShowUnityPrompt = function (
-          gameObjectName,
-          methodName,
-          defaultText,
-          messageText
-        ) {
-          currentGameObject = gameObjectName;
-          currentMethodName = methodName;
-          messageEl.textContent = messageText || "";
-          inputEl.value = defaultText || "";
-
-          console.log(">> ShowUnityPrompt — exibindo prompt agora");
-          // 4.2.1) bloqueia clique/tap em todo o wrapper
-          wrapper.style.pointerEvents = "none";
-          // 4.2.2) mostra o container do prompt
-          container.style.setProperty("display", "flex", "important");
-          inputEl.focus();
-        };
-
-        // 4.3) OK: envia texto ao Unity e reabilita clique/tap do wrapper
-        okBtn.addEventListener("click", () => {
-          console.log(">> OK pressionado — ocultando prompt");
-          const texto = inputEl.value;
-          container.style.setProperty("display", "none", "important");
-          wrapper.style.pointerEvents = "auto"; // reabilita clique no wrapper
-
-          if (
-            typeof gameInstance !== "undefined" &&
-            currentGameObject &&
-            currentMethodName
-          ) {
-            gameInstance.SendMessage(
-              currentGameObject,
-              currentMethodName,
-              texto
-            );
-          }
-        });
-
-        // 4.4) Cancelar: envia string vazia ao Unity e reabilita clique/tap
-        cancelBtn.addEventListener("click", () => {
-          console.log(">> Cancel pressionado — ocultando prompt");
-          container.style.setProperty("display", "none", "important");
-          wrapper.style.pointerEvents = "auto";
-
-          if (
-            typeof gameInstance !== "undefined" &&
-            currentGameObject &&
-            currentMethodName
-          ) {
-            gameInstance.SendMessage(currentGameObject, currentMethodName, "");
-          }
-        });
-      });
-    </script>
-
-    <!-- 5) SCRIPT ORIGINAL DO OVERLAY (mantenha igual) -->
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const overlay = document.getElementById("content-container");
-        const inner = document.getElementById("content-inner");
-        const closeBtn = document.getElementById("content-close-btn");
-
-        function ShowSimulationOverlay() {
-          fetch("assets/content.html", { cache: "no-cache" })
-            .then((resp) => (resp.ok ? resp.text() : Promise.reject(resp.status)))
-            .then((html) => {
-              inner.innerHTML = html;
-              overlay.classList.add("active");
-              document.documentElement.style.overflow = "hidden";
-              document.body.style.overflow = "hidden";
-            })
-            .catch((err) => console.error("Erro ShowSimulationOverlay:", err));
-        }
-
-        function closeOverlay() {
-          inner.innerHTML = "";
-          overlay.classList.remove("active");
-          document.documentElement.style.overflow = "auto";
-          document.body.style.overflow = "auto";
-        }
-
-        closeBtn.addEventListener("click", closeOverlay);
-        window.ShowSimulationOverlay = ShowSimulationOverlay;
-      });
-    </script>
   </head>
 
   <body>
-    <!-- 6) WRAPPER: dentro dele, o canvas e o prompt -->
-    <div id="unity-wrapper" class="unity-fixed">
+    <!-- 1) UNITY CONTAINER: basta manter o bloco padrão da Unity -->
+    <div id="unity-container" class="unity-fixed">
       <canvas id="unity-canvas" tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
@@ -220,33 +33,17 @@
         <div id="unity-fullscreen-button"></div>
         <div id="unity-build-title">IFVetores</div>
       </div>
-
-      <!-- 7) PROMPT INSERIDO AQUI (filho de #unity-wrapper) -->
-      <div id="unityPromptContainer">
-        <div id="unityPromptBox">
-          <div id="unityPromptMessage">Digite o valor:</div>
-          <input type="text" id="unityPromptInput" />
-          <div id="unityPromptButtons">
-            <button id="unityPromptCancel" class="unityPromptBtn">
-              Cancelar
-            </button>
-            <button id="unityPromptOk" class="unityPromptBtn">OK</button>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- 8) OVERLAY-PÁGINA ORIGINAL (mantenha igual) -->
+    <!-- 2) OVERLAY (caso você esteja usando algum overlay de conteúdo) -->
     <div id="content-container" class="overlay">
       <button id="content-close-btn" class="close-btn">×</button>
       <div id="content-inner" class="content-inner"></div>
     </div>
 
-    <!-- 9) BOOTSTRAP DO UNITY WEBGL
-          Nota: pedimos fullscreen no #unity-wrapper, não no canvas -->
+    <!-- 3) BOOTSTRAP DO UNITY WEBGL (padrão) -->
     <script>
       var canvas = document.querySelector("#unity-canvas");
-      var wrapper = document.querySelector("#unity-wrapper");
 
       function unityShowBanner(msg, type) {
         var warningBanner = document.querySelector("#unity-warning");
@@ -299,9 +96,8 @@
         })
           .then((instance) => {
             document.querySelector("#unity-loading-bar").style.display = "none";
-            // 9.1) agora a chamada de fullscreen é no wrapper, não no canvas
             document.querySelector("#unity-fullscreen-button").onclick = () => {
-              wrapper.requestFullscreen().catch(() => {});
+              canvas.requestFullscreen().catch(() => {});
             };
           })
           .catch((err) => {
