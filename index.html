@@ -20,23 +20,23 @@
          (1) PROMPT CUSTOMIZADO PARA MOBILE (HTML/CSS/JS)
          =========================== -->
     <style>
-      /* 1. Container do prompt – invisível até ser ativado */
+      /* Container do prompt – invisível até ser ativado */
       #unityPromptContainer {
-        display: none !important;               /* começa escondido */
+        display: none !important;               
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
         background-color: rgba(0, 0, 0, 0.6);
-        z-index: 99999 !important;               /* ter certeza de que fica acima de tudo */
-        pointer-events: all;                    /* receber clique/toque */
+        z-index: 100001 !important;           /* maior que overlay (100000) */
+        pointer-events: all;                   
       }
 
-      /* 2. Caixa branca do prompt: sempre a 30% do topo para ficar acima do teclado */
+      /* Caixa branca do prompt: fixa a 10vh do topo para não ficar atrás do teclado */
       #unityPromptBox {
         position: absolute;
-        top: 30vh;                               /* 30% da altura da viewport */
+        top: 10vh;                              /* 10% abaixo do topo */
         left: 50%;
         transform: translateX(-50%);
         width: 80%;
@@ -127,12 +127,12 @@
           messageEl.textContent = messageText || "";
           inputEl.value = defaultText || "";
 
-          // Desliga pointer-events do canvas para garantir que o input HTML receba toque
+          // Desliga pointer-events do canvas Unity para permitir toque no <input>
           if (unityContainer) {
             unityContainer.style.pointerEvents = "none";
           }
 
-          // Força exibir o container (mesmo se existirem overrides de CSS):
+          // Força exibir o container do prompt
           promptContainer.style.setProperty("display", "flex", "important");
           inputEl.focus();
         };
@@ -140,7 +140,6 @@
         // (1c) BOTÃO "OK" → envia resultado ao Unity e reabilita pointer-events
         okBtn.addEventListener("click", () => {
           const texto = inputEl.value;
-          // Esconde o container (mesmo que CSS tente sobrescrever)
           promptContainer.style.setProperty("display", "none", "important");
           if (unityContainer) {
             unityContainer.style.pointerEvents = "auto";
