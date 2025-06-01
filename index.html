@@ -3,108 +3,35 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
     <title>Unity Web Player | IFVetores</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
-    <link rel="stylesheet" href="assets/overlay.css">
-
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const overlay = document.getElementById('content-container');
-        const inner = document.getElementById('content-inner');
-        const closeBtn = document.getElementById('content-close-btn');
-
-        function ShowSimulationOverlay() {
-          const overlay = document.getElementById('content-container');
-          const inner = document.getElementById('content-inner');
-
-          function mostrarOverlay() {
-            fetch('assets/content.html', { cache: 'no-cache' })
-              .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
-              .then(html => {
-                inner.innerHTML = html;
-                overlay.style.display = 'flex';
-                overlay.style.visibility = 'visible';
-                overlay.style.pointerEvents = 'auto';
-                overlay.style.zIndex = '9999';
-              })
-              .catch(err => console.error('Erro ShowSimulationOverlay:', err));
-          }
-
-          if (document.fullscreenElement) {
-            document.exitFullscreen()
-              .then(() => {
-                document.addEventListener('fullscreenchange', () => {
-                  if (!document.fullscreenElement) {
-                    mostrarOverlay();
-                  }
-                }, { once: true });
-              })
-              .catch(() => mostrarOverlay());
-          } else {
-            mostrarOverlay();
-          }
-        }
-
-        closeBtn.addEventListener('click', () => {
-          inner.innerHTML = '';
-
-          const unityCanvas = document.getElementById('unity-canvas');
-          if (unityCanvas.requestFullscreen) {
-            unityCanvas.requestFullscreen().then(() => {
-              requestAnimationFrame(() => {
-                unityCanvas.style.opacity = '0.99';
-                requestAnimationFrame(() => {
-                  unityCanvas.style.opacity = '1';
-                });
-              });
-            }).catch(err =>
-              console.warn('Erro ao entrar em fullscreen:', err)
-            );
-          }
-
-          setTimeout(() => overlay.style.display = 'none', 300);
-        });
-
-        window.ShowSimulationOverlay = ShowSimulationOverlay;
-
-        overlay.style.display = 'flex';
-        ShowSimulationOverlay();
-      });
-    </script>
   </head>
-
   <body>
-    <!-- Overlay -->
-    <div id="content-container" class="overlay" style="display: flex;">
-      <button id="content-close-btn" class="overlay-close">×</button>
-      <div id="content-inner"></div>
-    </div>
-
-    <!-- Unity -->
     <div id="unity-container" class="unity-desktop">
-      <!-- Canvas deve ter tabindex="0" para receber foco no touch -->
-      <canvas id="unity-canvas" tabindex="0"></canvas>
+      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
           <div id="unity-progress-bar-full"></div>
         </div>
       </div>
-      <div id="unity-warning"></div>
+      <div id="unity-warning"> </div>
       <div id="unity-footer">
         <div id="unity-logo-title-footer"></div>
         <div id="unity-fullscreen-button"></div>
         <div id="unity-build-title">IFVetores</div>
       </div>
     </div>
-
-    <!-- Unity Bootstrap -->
     <script>
       var canvas = document.querySelector("#unity-canvas");
-      window.unityInstance = null;
 
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
       function unityShowBanner(msg, type) {
         var warningBanner = document.querySelector("#unity-warning");
         function updateBannerVisibility() {
@@ -113,10 +40,10 @@
         var div = document.createElement('div');
         div.innerHTML = msg;
         warningBanner.appendChild(div);
-        if (type === 'error') div.style.background = 'red';
-        else if (type === 'warning') {
-          div.style.background = 'yellow';
-          setTimeout(() => {
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
             warningBanner.removeChild(div);
             updateBannerVisibility();
           }, 5000);
@@ -135,28 +62,66 @@
         companyName: "DefaultCompany",
         productName: "IFVetores",
         productVersion: "1.0",
-        showBanner: unityShowBanner
+        showBanner: unityShowBanner,
       };
 
-      var unityScript = document.createElement('script');
-      unityScript.src = loaderUrl;
-      unityScript.onload = function() {
+      // By default, Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      // If you would like all file writes inside Unity Application.persistentDataPath
+      // directory to automatically persist so that the contents are remembered when
+      // the user revisits the site the next time, uncomment the following line:
+      // config.autoSyncPersistentDataPath = true;
+      // This autosyncing is currently not the default behavior to avoid regressing
+      // existing user projects that might rely on the earlier manual
+      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
+      // expected to change.
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        document.querySelector("#unity-container").className = "unity-mobile";
+        canvas.className = "unity-mobile";
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
+
+
+      } else {
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+        canvas.style.width = "960px";
+        canvas.style.height = "600px";
+      }
+
+      document.querySelector("#unity-loading-bar").style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
-          document.querySelector('#unity-progress-bar-full').style.width = (100 * progress) + '%';
-        }).then((instance) => {
-          window.unityInstance = instance;
-          document.querySelector('#unity-loading-bar').style.display = 'none';
-          document.querySelector('#unity-fullscreen-button').onclick = () => {
-            canvas.requestFullscreen().catch(() => {});
-          };
-        }).catch((err) => {
-          console.error(err);
-          alert('Erro ao iniciar Unity: ' + err);
-        });
-      };
-      document.body.appendChild(unityScript);
+          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+              }).then((unityInstance) => {
+                document.querySelector("#unity-loading-bar").style.display = "none";
+                document.querySelector("#unity-fullscreen-button").onclick = () => {
+                  unityInstance.SetFullscreen(1);
+                };
+
+              }).catch((message) => {
+                alert(message);
+              });
+            };
+
+      document.body.appendChild(script);
+
     </script>
-    <!-- Fim do Unity Bootstrap -->
-    <script src="webgl-mobile-input.js"></script>
   </body>
 </html>
