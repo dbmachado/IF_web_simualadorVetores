@@ -16,6 +16,148 @@
     <!-- CSS do overlay -->
     <link rel="stylesheet" href="assets/overlay.css" />
 
+    <!-- ===========================
+         (1) PROMPT CUSTOMIZADO PARA MOBILE (HTML/CSS/JS)
+         =========================== -->
+    <style>
+      /* Container do prompt – invisível até ser ativado */
+      #unityPromptContainer {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 10000; /* acima do canvas Unity */
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Caixa branca central do prompt */
+      #unityPromptBox {
+        background-color: #fff;
+        border-radius: 8px;
+        max-width: 90vw;
+        width: 80%;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+      }
+
+      #unityPromptMessage {
+        margin-bottom: 12px;
+        font-size: 16px;
+        color: #333;
+      }
+
+      #unityPromptInput {
+        padding: 8px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 12px;
+      }
+
+      #unityPromptButtons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .unityPromptBtn {
+        padding: 8px 12px;
+        font-size: 14px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      #unityPromptOk {
+        background-color: #0099ff;
+        color: #fff;
+      }
+
+      #unityPromptCancel {
+        background-color: #ddd;
+        color: #333;
+      }
+    </style>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // (1a) CRIAR E INJETAR O CONTAINER DO PROMPT
+        const promptContainer = document.createElement("div");
+        promptContainer.id = "unityPromptContainer";
+        promptContainer.innerHTML = `
+          <div id="unityPromptBox">
+            <div id="unityPromptMessage">Digite o valor:</div>
+            <input type="text" id="unityPromptInput" />
+            <div id="unityPromptButtons">
+              <button id="unityPromptCancel" class="unityPromptBtn">Cancelar</button>
+              <button id="unityPromptOk" class="unityPromptBtn">OK</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(promptContainer);
+
+        const messageEl = document.getElementById("unityPromptMessage");
+        const inputEl = document.getElementById("unityPromptInput");
+        const okBtn = document.getElementById("unityPromptOk");
+        const cancelBtn = document.getElementById("unityPromptCancel");
+
+        let currentGameObject = "";
+        let currentMethodName = "";
+
+        // (1b) FUNÇÃO CHAMADA PELO UNITY PARA EXIBIR O PROMPT CUSTOMIZADO (MOBILE)
+        window.ShowUnityPrompt = function (
+          gameObjectName,
+          methodName,
+          defaultText,
+          messageText
+        ) {
+          currentGameObject = gameObjectName;
+          currentMethodName = methodName;
+          messageEl.textContent = messageText || "";
+          inputEl.value = defaultText || "";
+          promptContainer.style.display = "flex";
+          inputEl.focus();
+        };
+
+        // (1c) BOTÃO "OK" → envia resultado ao Unity
+        okBtn.addEventListener("click", () => {
+          const texto = inputEl.value;
+          promptContainer.style.display = "none";
+          if (
+            typeof gameInstance !== "undefined" &&
+            currentGameObject &&
+            currentMethodName
+          ) {
+            gameInstance.SendMessage(currentGameObject, currentMethodName, texto);
+          }
+        });
+
+        // (1d) BOTÃO "Cancelar" → envia string vazia ao Unity
+        cancelBtn.addEventListener("click", () => {
+          promptContainer.style.display = "none";
+          if (
+            typeof gameInstance !== "undefined" &&
+            currentGameObject &&
+            currentMethodName
+          ) {
+            gameInstance.SendMessage(currentGameObject, currentMethodName, "");
+          }
+        });
+      });
+    </script>
+    <!-- ===========================
+         FIM DO PROMPT CUSTOMIZADO
+         =========================== -->
+
+    <!-- ===========================
+         (2) SCRIPT ORIGINAL DO OVERLAY
+         =========================== -->
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const overlay = document.getElementById("content-container");
@@ -23,8 +165,7 @@
         const closeBtn = document.getElementById("content-close-btn");
 
         /**
-         * Abre o overlay-página: carrega content.html, injeta em #content-inner,
-         * adiciona .active e tira scroll do body/html.
+         * Abre o overlay-página
          */
         function ShowSimulationOverlay() {
           fetch("assets/content.html", { cache: "no-cache" })
@@ -39,7 +180,7 @@
         }
 
         /**
-         * Fecha o overlay e reabilita scroll do body/html.
+         * Fecha o overlay e restabelece scroll do body/html.
          */
         function closeOverlay() {
           inner.innerHTML = "";
@@ -50,11 +191,11 @@
 
         closeBtn.addEventListener("click", closeOverlay);
         window.ShowSimulationOverlay = ShowSimulationOverlay;
-
-        // Se quiser abrir automaticamente ao carregar:
-        // ShowSimulationOverlay();
       });
     </script>
+    <!-- ===========================
+         FIM DO SCRIPT DO OVERLAY
+         =========================== -->
   </head>
 
   <body>
@@ -158,5 +299,8 @@
       };
       document.body.appendChild(unityScript);
     </script>
+    <!-- ================================
+         FIM DO BOOTSTRAP DO UNITY WEBGL
+         ================================= -->
   </body>
 </html>

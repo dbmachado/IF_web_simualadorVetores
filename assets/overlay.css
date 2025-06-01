@@ -138,7 +138,7 @@ body {
 }
 
 #header-ifrs img {
-  height: 80px;       /* menor do que antes */
+  height: 140px;       /*tamanho cabeçho */
   max-width: 90%;
   object-fit: contain;
 }
@@ -296,9 +296,9 @@ body {
     gap: 12px;
   }
 
-  #header-ifrs img {
+  #header-ifrs img { /*logo*/
     height: 50px;
-    margin-bottom: 12px;
+    margin-bottom: 5px;
   }
 
   .intro-section {
