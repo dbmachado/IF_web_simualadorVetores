@@ -13,214 +13,12 @@
     <link rel="shortcut icon" href="TemplateData/favicon.ico" />
     <link rel="stylesheet" href="TemplateData/style.css" />
 
-    <!-- CSS do overlay -->
+    <!-- CSS do overlay (se houver) -->
     <link rel="stylesheet" href="assets/overlay.css" />
 
-    <!-- ===========================
-         (1) PROMPT CUSTOMIZADO PARA MOBILE (HTML/CSS/JS)
-         =========================== -->
-    <style>
-      /* Container do prompt – invisível até ser ativado */
-      #unityPromptContainer {
-        display: none !important;               
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 100001 !important;           /* maior que overlay (100000) */
-        pointer-events: all;                   
-      }
-
-      /* Caixa branca do prompt: fixa a 10vh do topo para não ficar atrás do teclado */
-      #unityPromptBox {
-        position: absolute;
-        top: 10vh;                              /* 10% abaixo do topo */
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80%;
-        max-width: 300px;
-        background-color: #fff;
-        border-radius: 8px;
-        padding: 16px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        display: flex;
-        flex-direction: column;
-      }
-
-      #unityPromptMessage {
-        margin-bottom: 12px;
-        font-size: 16px;
-        color: #333;
-        text-align: left;
-      }
-
-      #unityPromptInput {
-        padding: 8px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        margin-bottom: 12px;
-      }
-
-      #unityPromptButtons {
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-      }
-
-      .unityPromptBtn {
-        padding: 8px 12px;
-        font-size: 14px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-
-      #unityPromptOk {
-        background-color: #0099ff;
-        color: #fff;
-      }
-
-      #unityPromptCancel {
-        background-color: #ddd;
-        color: #333;
-      }
-    </style>
-
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        // (1a) CRIAR E INJETAR O CONTAINER DO PROMPT
-        const promptContainer = document.createElement("div");
-        promptContainer.id = "unityPromptContainer";
-        promptContainer.innerHTML = `
-          <div id="unityPromptBox">
-            <div id="unityPromptMessage">Digite o valor:</div>
-            <input type="text" id="unityPromptInput" />
-            <div id="unityPromptButtons">
-              <button id="unityPromptCancel" class="unityPromptBtn">Cancelar</button>
-              <button id="unityPromptOk" class="unityPromptBtn">OK</button>
-            </div>
-          </div>
-        `;
-        document.body.appendChild(promptContainer);
-
-        const messageEl = document.getElementById("unityPromptMessage");
-        const inputEl = document.getElementById("unityPromptInput");
-        const okBtn = document.getElementById("unityPromptOk");
-        const cancelBtn = document.getElementById("unityPromptCancel");
-        const unityContainer = document.getElementById("unity-container");
-
-        let currentGameObject = "";
-        let currentMethodName = "";
-
-        // (1b) FUNÇÃO CHAMADA PELO UNITY PARA EXIBIR O PROMPT CUSTOMIZADO (MOBILE)
-        window.ShowUnityPrompt = function (
-          gameObjectName,
-          methodName,
-          defaultText,
-          messageText
-        ) {
-          currentGameObject = gameObjectName;
-          currentMethodName = methodName;
-          messageEl.textContent = messageText || "";
-          inputEl.value = defaultText || "";
-
-          // Desliga pointer-events do canvas Unity para permitir toque no <input>
-          if (unityContainer) {
-            unityContainer.style.pointerEvents = "none";
-          }
-
-          // Força exibir o container do prompt
-          promptContainer.style.setProperty("display", "flex", "important");
-          inputEl.focus();
-        };
-
-        // (1c) BOTÃO "OK" → envia resultado ao Unity e reabilita pointer-events
-        okBtn.addEventListener("click", () => {
-          const texto = inputEl.value;
-          promptContainer.style.setProperty("display", "none", "important");
-          if (unityContainer) {
-            unityContainer.style.pointerEvents = "auto";
-          }
-          if (
-            typeof gameInstance !== "undefined" &&
-            currentGameObject &&
-            currentMethodName
-          ) {
-            gameInstance.SendMessage(currentGameObject, currentMethodName, texto);
-          }
-        });
-
-        // (1d) BOTÃO "Cancelar" → envia string vazia ao Unity e reabilita pointer-events
-        cancelBtn.addEventListener("click", () => {
-          promptContainer.style.setProperty("display", "none", "important");
-          if (unityContainer) {
-            unityContainer.style.pointerEvents = "auto";
-          }
-          if (
-            typeof gameInstance !== "undefined" &&
-            currentGameObject &&
-            currentMethodName
-          ) {
-            gameInstance.SendMessage(currentGameObject, currentMethodName, "");
-          }
-        });
-      });
-    </script>
-    <!-- ===========================
-         FIM DO PROMPT CUSTOMIZADO
-         =========================== -->
-
-    <!-- ===========================
-         (2) SCRIPT ORIGINAL DO OVERLAY (sem alterações)
-         =========================== -->
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const overlay = document.getElementById("content-container");
-        const inner = document.getElementById("content-inner");
-        const closeBtn = document.getElementById("content-close-btn");
-
-        /**
-         * Abre o overlay-página: carrega content.html, injeta em #content-inner,
-         * adiciona .active e remove scroll do body/html.
-         */
-        function ShowSimulationOverlay() {
-          fetch("assets/content.html", { cache: "no-cache" })
-            .then((resp) => (resp.ok ? resp.text() : Promise.reject(resp.status)))
-            .then((html) => {
-              inner.innerHTML = html;
-              overlay.classList.add("active");
-              document.documentElement.style.overflow = "hidden";
-              document.body.style.overflow = "hidden";
-            })
-            .catch((err) => console.error("Erro ShowSimulationOverlay:", err));
-        }
-
-        /**
-         * Fecha o overlay e restabelece scroll do body/html.
-         */
-        function closeOverlay() {
-          inner.innerHTML = "";
-          overlay.classList.remove("active");
-          document.documentElement.style.overflow = "auto";
-          document.body.style.overflow = "auto";
-        }
-
-        closeBtn.addEventListener("click", closeOverlay);
-        window.ShowSimulationOverlay = ShowSimulationOverlay;
-      });
-    </script>
-    <!-- ===========================
-         FIM DO SCRIPT DO OVERLAY
-         =========================== -->
+    <!-- Mantenha apenas o script padrão da Unity WebGL: -->
   </head>
-
   <body>
-    <!-- ================================
-         1) UNITY CONTAINER – ocupa 100% da tela (fixed, por trás)
-         ================================= -->
     <div id="unity-container" class="unity-fixed">
       <canvas id="unity-canvas" tabindex="-1"></canvas>
       <div id="unity-loading-bar">
@@ -237,17 +35,11 @@
       </div>
     </div>
 
-    <!-- ================================
-         2) OVERLAY-PÁGINA (sempre fixed, invisível até .active)
-         ================================= -->
     <div id="content-container" class="overlay">
       <button id="content-close-btn" class="close-btn">×</button>
       <div id="content-inner" class="content-inner"></div>
     </div>
 
-    <!-- ================================
-         3) BOOTSTRAP DO UNITY WEBGL
-         ================================= -->
     <script>
       var canvas = document.querySelector("#unity-canvas");
 
@@ -290,10 +82,8 @@
         showBanner: unityShowBanner,
       };
 
-      // Exibe a barra de loading até o Unity inicializar
       document.querySelector("#unity-loading-bar").style.display = "block";
 
-      // Carrega o loader.js do Unity e cria a instância
       var unityScript = document.createElement("script");
       unityScript.src = loaderUrl;
       unityScript.onload = function () {
@@ -318,8 +108,5 @@
       };
       document.body.appendChild(unityScript);
     </script>
-    <!-- ================================
-         FIM DO BOOTSTRAP DO UNITY WEBGL
-         ================================= -->
   </body>
 </html>
