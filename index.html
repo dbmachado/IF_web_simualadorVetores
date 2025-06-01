@@ -32,6 +32,7 @@
         z-index: 10000; /* acima do canvas Unity */
         justify-content: center;
         align-items: center;
+        pointer-events: all; /* garante que o prompt receba toque/clique */
       }
 
       /* Caixa branca central do prompt */
@@ -106,6 +107,7 @@
         const inputEl = document.getElementById("unityPromptInput");
         const okBtn = document.getElementById("unityPromptOk");
         const cancelBtn = document.getElementById("unityPromptCancel");
+        const unityContainer = document.getElementById("unity-container");
 
         let currentGameObject = "";
         let currentMethodName = "";
@@ -121,14 +123,23 @@
           currentMethodName = methodName;
           messageEl.textContent = messageText || "";
           inputEl.value = defaultText || "";
+
+          // Desliga pointer-events do canvas para garantir que o input HTML receba toque
+          if (unityContainer) {
+            unityContainer.style.pointerEvents = "none";
+          }
+
           promptContainer.style.display = "flex";
           inputEl.focus();
         };
 
-        // (1c) BOTÃO "OK" → envia resultado ao Unity
+        // (1c) BOTÃO "OK" → envia resultado ao Unity e reabilita pointer-events
         okBtn.addEventListener("click", () => {
           const texto = inputEl.value;
           promptContainer.style.display = "none";
+          if (unityContainer) {
+            unityContainer.style.pointerEvents = "auto";
+          }
           if (
             typeof gameInstance !== "undefined" &&
             currentGameObject &&
@@ -138,9 +149,12 @@
           }
         });
 
-        // (1d) BOTÃO "Cancelar" → envia string vazia ao Unity
+        // (1d) BOTÃO "Cancelar" → envia string vazia ao Unity e reabilita pointer-events
         cancelBtn.addEventListener("click", () => {
           promptContainer.style.display = "none";
+          if (unityContainer) {
+            unityContainer.style.pointerEvents = "auto";
+          }
           if (
             typeof gameInstance !== "undefined" &&
             currentGameObject &&
@@ -164,6 +178,10 @@
         const inner = document.getElementById("content-inner");
         const closeBtn = document.getElementById("content-close-btn");
 
+        /**
+         * Abre o overlay-página: carrega content.html, injeta em #content-inner,
+         * adiciona .active e remove scroll do body/html.
+         */
         function ShowSimulationOverlay() {
           fetch("assets/content.html", { cache: "no-cache" })
             .then((resp) => (resp.ok ? resp.text() : Promise.reject(resp.status)))
@@ -176,6 +194,9 @@
             .catch((err) => console.error("Erro ShowSimulationOverlay:", err));
         }
 
+        /**
+         * Fecha o overlay e restabelece scroll do body/html.
+         */
         function closeOverlay() {
           inner.innerHTML = "";
           overlay.classList.remove("active");
