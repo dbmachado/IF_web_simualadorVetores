@@ -1,25 +1,95 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en-us">
   <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
-    />
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
     <title>Unity Web Player | IFVetores</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <link rel="stylesheet" href="assets/overlay.css">
 
-    <!-- Ícone e CSS padrão da Unity -->
-    <link rel="shortcut icon" href="TemplateData/favicon.ico" />
-    <link rel="stylesheet" href="TemplateData/style.css" />
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const overlay = document.getElementById('content-container');
+        const inner = document.getElementById('content-inner');
+        const closeBtn = document.getElementById('content-close-btn');
 
-    <!-- Se você estiver usando overlay, mantenha apenas isso: -->
-    <link rel="stylesheet" href="assets/overlay.css" />
+        function isMobile() {
+          return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        }
+
+        function ShowSimulationOverlay() {
+          const overlay = document.getElementById('content-container');
+          const inner = document.getElementById('content-inner');
+
+          function mostrarOverlay() {
+            fetch('assets/content.html', { cache: 'no-cache' })
+              .then(resp => resp.ok ? resp.text() : Promise.reject(resp.status))
+              .then(html => {
+                inner.innerHTML = html;
+
+                overlay.style.display = 'flex';
+                overlay.style.visibility = 'visible';
+                overlay.style.pointerEvents = 'auto';
+                overlay.style.zIndex = '9999';
+              })
+              .catch(err => console.error('Erro ShowSimulationOverlay:', err));
+          }
+
+          if (document.fullscreenElement) {
+            document.exitFullscreen()
+              .then(() => {
+                document.addEventListener('fullscreenchange', () => {
+                  if (!document.fullscreenElement) {
+                    mostrarOverlay();
+                  }
+                }, { once: true }); // remove o listener depois
+              })
+              .catch(() => mostrarOverlay());
+          } else {
+            mostrarOverlay();
+          }
+        }
+
+
+        closeBtn.addEventListener('click', () => {
+          inner.innerHTML = '';
+
+          const unityCanvas = document.getElementById('unity-canvas');
+          if (unityCanvas.requestFullscreen) {
+            unityCanvas.requestFullscreen().then(() => {
+              requestAnimationFrame(() => {
+                unityCanvas.style.opacity = '0.99';
+                requestAnimationFrame(() => {
+                  unityCanvas.style.opacity = '1';
+                });
+              });
+            }).catch(err =>
+              console.warn('Erro ao entrar em fullscreen:', err)
+            );
+          }
+
+          setTimeout(() => overlay.style.display = 'none', 300);
+        });
+
+        window.ShowSimulationOverlay = ShowSimulationOverlay;
+
+        overlay.style.display = 'flex';
+        ShowSimulationOverlay();
+      });
+    </script>
   </head>
 
   <body>
-    <!-- 1) UNITY CONTAINER: basta manter o bloco padrão da Unity -->
-    <div id="unity-container" class="unity-fixed">
+    <!-- Overlay -->
+    <div id="content-container" class="overlay" style="display: flex;">
+      <button id="content-close-btn" class="overlay-close">×</button>
+      <div id="content-inner"></div>
+    </div>
+
+    <!-- Unity -->
+    <div id="unity-container" class="unity-desktop">
       <canvas id="unity-canvas" tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
@@ -35,34 +105,23 @@
       </div>
     </div>
 
-    <!-- 2) OVERLAY (caso você esteja usando algum overlay de conteúdo) -->
-    <div id="content-container" class="overlay">
-      <button id="content-close-btn" class="close-btn">×</button>
-      <div id="content-inner" class="content-inner"></div>
-    </div>
-
-    <!-- 3) BOOTSTRAP DO UNITY WEBGL (padrão) -->
+    <!-- Unity Bootstrap -->
     <script>
       var canvas = document.querySelector("#unity-canvas");
+      window.unityInstance = null;
 
       function unityShowBanner(msg, type) {
         var warningBanner = document.querySelector("#unity-warning");
         function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length
-            ? "block"
-            : "none";
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
         }
-        var div = document.createElement("div");
+        var div = document.createElement('div');
         div.innerHTML = msg;
         warningBanner.appendChild(div);
-        if (type === "error") {
-          div.style.background = "red";
-          div.style.color = "#fff";
-          div.style.padding = "10px";
-        } else if (type === "warning") {
-          div.style.background = "yellow";
-          div.style.padding = "10px";
-          setTimeout(function () {
+        if (type === 'error') div.style.background = 'red';
+        else if (type === 'warning') {
+          div.style.background = 'yellow';
+          setTimeout(() => {
             warningBanner.removeChild(div);
             updateBannerVisibility();
           }, 5000);
@@ -81,32 +140,24 @@
         companyName: "DefaultCompany",
         productName: "IFVetores",
         productVersion: "1.0",
-        showBanner: unityShowBanner,
+        showBanner: unityShowBanner
       };
 
-      document.querySelector("#unity-loading-bar").style.display = "block";
-
-      var unityScript = document.createElement("script");
+      var unityScript = document.createElement('script');
       unityScript.src = loaderUrl;
-      unityScript.onload = function () {
+      unityScript.onload = function() {
         createUnityInstance(canvas, config, (progress) => {
-          document.querySelector(
-            "#unity-progress-bar-full"
-          ).style.width = 100 * progress + "%";
-        })
-          .then((instance) => {
-            document.querySelector("#unity-loading-bar").style.display = "none";
-            document.querySelector("#unity-fullscreen-button").onclick = () => {
-              canvas.requestFullscreen().catch(() => {});
-            };
-          })
-          .catch((err) => {
-            console.error(err);
-            alert("Erro ao iniciar Unity: " + err);
-          });
-      };
-      unityScript.onerror = (e) => {
-        console.error("Falha ao carregar o loader.js do Unity:", e);
+          document.querySelector('#unity-progress-bar-full').style.width = (100 * progress) + '%';
+        }).then((instance) => {
+          window.unityInstance = instance;
+          document.querySelector('#unity-loading-bar').style.display = 'none';
+          document.querySelector('#unity-fullscreen-button').onclick = () => {
+            canvas.requestFullscreen().catch(() => {});
+          };
+        }).catch((err) => {
+          console.error(err);
+          alert('Erro ao iniciar Unity: ' + err);
+        });
       };
       document.body.appendChild(unityScript);
     </script>
