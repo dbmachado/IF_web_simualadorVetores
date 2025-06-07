@@ -6,8 +6,17 @@
     <title>Unity Web Player | IFVetores</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
-    <!-- CSS do overlay -->
-    <link rel="stylesheet" href="assets/overlay.css">
+    <style>
+      /* Impede seleção de texto e elementos na página */
+      html, body, #unity-container, #unity-canvas, #unity-loading-bar, #unity-footer, #unity-warning {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+      }
+    </style>
+    <!-- Removido o código do WebGLOverlay -->
   </head>
   <body>
     <!-- Unity Container -->
@@ -19,7 +28,7 @@
           <div id="unity-progress-bar-full"></div>
         </div>
       </div>
-      <div id="unity-warning"> </div>
+      <div id="unity-warning"></div>
       <div id="unity-footer">
         <div id="unity-logo-title-footer"></div>
         <div id="unity-fullscreen-button"></div>
@@ -27,13 +36,12 @@
       </div>
     </div>
 
-    <!-- Overlay de Conteúdo (WebGLOverlay) -->
-    <div id="content-container" class="overlay">
-      <button id="content-close-btn" class="close-btn">×</button>
-      <div id="content-inner" class="content-inner"></div>
-    </div>
-
     <script>
+      // Impede seleção de texto via arraste ou clique duplo
+      document.addEventListener('selectstart', function(e) { e.preventDefault(); });
+      // Impede menu de contexto (botão direito)
+      document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
       var canvas = document.querySelector("#unity-canvas");
 
       // Mostra banner de aviso ou erro do Unity
@@ -99,35 +107,6 @@
         });
       };
       document.body.appendChild(script);
-
-      // Funções do overlay
-      document.addEventListener("DOMContentLoaded", () => {
-        const overlay = document.getElementById("content-container");
-        const inner = document.getElementById("content-inner");
-        const closeBtn = document.getElementById("content-close-btn");
-
-        function ShowSimulationOverlay() {
-          fetch("assets/content.html", { cache: "no-cache" })
-            .then((resp) => (resp.ok ? resp.text() : Promise.reject(resp.status)))
-            .then((html) => {
-              inner.innerHTML = html;
-              overlay.classList.add("active");
-              document.documentElement.style.overflow = "hidden";
-              document.body.style.overflow = "hidden";
-            })
-            .catch((err) => console.error("Erro ShowSimulationOverlay:", err));
-        }
-
-        function closeOverlay() {
-          inner.innerHTML = "";
-          overlay.classList.remove("active");
-          document.documentElement.style.overflow = "auto";
-          document.body.style.overflow = "auto";
-        }
-
-        closeBtn.addEventListener("click", closeOverlay);
-        window.ShowSimulationOverlay = ShowSimulationOverlay;
-      });
     </script>
   </body>
 </html>
